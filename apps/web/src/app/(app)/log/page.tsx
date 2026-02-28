@@ -14,6 +14,7 @@ import {
   Button,
   Paper,
   Group,
+  Textarea,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconArrowLeft, IconCheck } from '@tabler/icons-react';
@@ -35,6 +36,7 @@ export default function LogPage() {
   const [distance, setDistance] = useState<number | string>(1);
   const [effort, setEffort] = useState<EffortLevel>(EffortLevel.MEDIUM);
   const [duration, setDuration] = useState<number | string>(10);
+  const [note, setNote] = useState('');
 
   useEffect(() => {
     api
@@ -88,6 +90,10 @@ export default function LogPage() {
       case MeasurementType.DURATION:
         body.durationMinutes = Number(duration);
         break;
+    }
+
+    if (note.trim()) {
+      body.note = note.trim();
     }
 
     try {
@@ -196,6 +202,17 @@ export default function LogPage() {
                   size="lg"
                 />
               )}
+
+              <Textarea
+                label="Note (optional)"
+                placeholder="Add a note about your workout..."
+                value={note}
+                onChange={(e) => setNote(e.currentTarget.value)}
+                maxLength={500}
+                autosize
+                minRows={2}
+                maxRows={4}
+              />
 
               <Paper p="md" radius="md" bg="teal.0" ta="center">
                 <Text size="sm" c="dimmed">
