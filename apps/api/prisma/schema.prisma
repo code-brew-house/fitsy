@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum MeasurementType {
+  DISTANCE
+  EFFORT
+  FLAT
+  DURATION
+}
+
+enum EffortLevel {
+  LOW
+  MEDIUM
+  HIGH
+  EXTREME
+}
+
+enum RedemptionStatus {
+  PENDING
+  FULFILLED
+  CANCELLED
+}
+
+model Family {
+  id            String         @id @default(uuid())
+  name          String
+  inviteCode    String         @unique
+  createdAt     DateTime       @default(now())
+  users         User[]
+  activityTypes ActivityType[]
+  rewards       Reward[]
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  avatarUrl    String?
+  role         Role          @default(MEMBER)
+  familyId     String?
+  family       Family?       @relation(fields: [familyId], references: [id])
+  totalPoints  Int           @default(0)
+  createdAt    DateTime      @default(now())
+  activityLogs ActivityLog[]
+  redemptions  Redemption[]
+}
+
+model ActivityType {
+  id              String          @id @default(uuid())
+  familyId        String
+  family          Family          @relation(fields: [familyId], references: [id])
+  name            String
+  icon            String
+  measurementType MeasurementType
+  pointsPerUnit   Float?
+  unit            String?
+  pointsLow       Int?
+  pointsMedium    Int?
+  pointsHigh      Int?
+  pointsExtreme   Int?
+  flatPoints      Int?
+  pointsPerMinute Float?
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  activityLogs    ActivityLog[]
+}
+
+model ActivityLog {
+  id              String          @id @default(uuid())
+  userId          String
+  user            User            @relation(fields: [userId], references: [id])
+  activityTypeId  String
+  activityType    ActivityType    @relation(fields: [activityTypeId], references: [id])
+  measurementType MeasurementType
+  distanceKm      Float?
+  effortLevel     EffortLevel?
+  durationMinutes Int?
+  pointsEarned    Int
+  createdAt       DateTime        @default(now())
+}
+
+model Reward {
+  id          String       @id @default(uuid())
+  familyId    String
+  family      Family       @relation(fields: [familyId], references: [id])
+  name        String
+  description String
+  imageUrl    String?
+  pointCost   Int
+  quantity    Int?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  redemptions Redemption[]
+}
+
+model Redemption {
+  id          String           @id @default(uuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  rewardId    String
+  reward      Reward           @relation(fields: [rewardId], references: [id])
+  pointsSpent Int
+  status      RedemptionStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+}
