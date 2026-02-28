@@ -55,6 +55,8 @@ model User {
   createdAt    DateTime      @default(now())
   activityLogs ActivityLog[]
   redemptions  Redemption[]
+  comments     Comment[]
+  reactions    Reaction[]
 }
 
 model ActivityType {
@@ -88,7 +90,33 @@ model ActivityLog {
   effortLevel     EffortLevel?
   durationMinutes Int?
   pointsEarned    Int
+  note            String?
   createdAt       DateTime        @default(now())
+  comments        Comment[]
+  reactions       Reaction[]
+}
+
+model Comment {
+  id            String      @id @default(uuid())
+  activityLogId String
+  activityLog   ActivityLog @relation(fields: [activityLogId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  text          String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Reaction {
+  id            String      @id @default(uuid())
+  activityLogId String
+  activityLog   ActivityLog @relation(fields: [activityLogId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  emoji         String
+  createdAt     DateTime    @default(now())
+
+  @@unique([activityLogId, userId, emoji])
 }
 
 model Reward {
