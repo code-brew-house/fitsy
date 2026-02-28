@@ -4,8 +4,22 @@ import { AuthModule } from './auth/auth.module';
 import { FamilyModule } from './family/family.module';
 import { ActivityTypesModule } from './activity-types/activity-types.module';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
+import { RewardsModule } from './rewards/rewards.module';
+import { RedemptionsModule } from './redemptions/redemptions.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, FamilyModule, ActivityTypesModule, ActivityLogsModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    FamilyModule,
+    ActivityTypesModule,
+    ActivityLogsModule,
+    RewardsModule,
+    RedemptionsModule,
+    LeaderboardModule,
+    DashboardModule,
+  ],
 })
 export class AppModule {}
