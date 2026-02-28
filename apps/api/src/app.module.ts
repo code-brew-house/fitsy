@@ -9,6 +9,7 @@ import { RedemptionsModule } from './redemptions/redemptions.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { CommentsModule } from './comments/comments.module';
+import { ReactionsModule } from './reactions/reactions.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommentsModule } from './comments/comments.module';
     LeaderboardModule,
     DashboardModule,
     CommentsModule,
+    ReactionsModule,
   ],
 })
 export class AppModule {}
