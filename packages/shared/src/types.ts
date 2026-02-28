@@ -56,6 +56,12 @@ export interface ActivityTypeResponse {
   createdAt: string;
 }
 
+export interface ReactionSummary {
+  emoji: string;
+  count: number;
+  userReacted: boolean;
+}
+
 export interface ActivityLogResponse {
   id: string;
   userId: string;
@@ -124,10 +130,4 @@ export interface CommentResponse {
   text: string;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface ReactionSummary {
-  emoji: string;
-  count: number;
-  userReacted: boolean;
 }
