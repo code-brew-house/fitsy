@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateActivityLogDto } from '@fitsy/shared';
+import { CreateActivityLogDto, UpdateActivityLogDto } from '@fitsy/shared';
 
 @Injectable()
 export class ActivityLogsService {
@@ -34,9 +34,11 @@ export class ActivityLogsService {
           effortLevel: dto.effortLevel ?? null,
           durationMinutes: dto.durationMinutes ?? null,
           pointsEarned,
+          note: dto.note ?? null,
         },
         include: {
           activityType: { select: { name: true, icon: true } },
+          user: { select: { name: true } },
         },
       }),
       this.prisma.user.update({
@@ -45,7 +47,23 @@ export class ActivityLogsService {
       }),
     ]);
 
-    return log;
+    return {
+      id: log.id,
+      userId: log.userId,
+      userName: log.user.name,
+      activityTypeId: log.activityTypeId,
+      activityTypeName: log.activityType.name,
+      activityTypeIcon: log.activityType.icon,
+      measurementType: log.measurementType,
+      distanceKm: log.distanceKm,
+      effortLevel: log.effortLevel,
+      durationMinutes: log.durationMinutes,
+      pointsEarned: log.pointsEarned,
+      note: log.note ?? null,
+      commentCount: 0,
+      reactions: [],
+      createdAt: log.createdAt.toISOString(),
+    };
   }
 
   async findOwn(userId: string, page: number = 1, limit: number = 20, activityTypeId?: string) {
@@ -120,6 +138,83 @@ export class ActivityLogsService {
       pointsEarned: log.pointsEarned,
       createdAt: log.createdAt.toISOString(),
     }));
+  }
+
+  async update(userId: string, logId: string, dto: UpdateActivityLogDto) {
+    const log = await this.prisma.activityLog.findUnique({
+      where: { id: logId },
+      include: { activityType: true },
+    });
+    if (!log) throw new NotFoundException('Activity log not found');
+    if (log.userId !== userId) throw new ForbiddenException('Not your activity log');
+
+    const oldPoints = log.pointsEarned;
+    const newPoints = this.calculatePoints(log.activityType, {
+      activityTypeId: log.activityTypeId,
+      distanceKm: dto.distanceKm ?? log.distanceKm ?? undefined,
+      effortLevel: (dto.effortLevel ?? log.effortLevel ?? undefined) as any,
+      durationMinutes: dto.durationMinutes ?? log.durationMinutes ?? undefined,
+    });
+    const pointsDelta = newPoints - oldPoints;
+
+    const [updated] = await this.prisma.$transaction([
+      this.prisma.activityLog.update({
+        where: { id: logId },
+        data: {
+          distanceKm: dto.distanceKm ?? log.distanceKm,
+          effortLevel: dto.effortLevel ?? log.effortLevel,
+          durationMinutes: dto.durationMinutes ?? log.durationMinutes,
+          note: dto.note !== undefined ? dto.note : log.note,
+          pointsEarned: newPoints,
+        },
+        include: {
+          activityType: { select: { name: true, icon: true } },
+          user: { select: { name: true } },
+        },
+      }),
+      ...(pointsDelta !== 0
+        ? [
+            this.prisma.user.update({
+              where: { id: userId },
+              data: { totalPoints: { increment: pointsDelta } },
+            }),
+          ]
+        : []),
+    ]);
+
+    return {
+      id: updated.id,
+      userId: updated.userId,
+      userName: updated.user.name,
+      activityTypeId: updated.activityTypeId,
+      activityTypeName: updated.activityType.name,
+      activityTypeIcon: updated.activityType.icon,
+      measurementType: updated.measurementType,
+      distanceKm: updated.distanceKm,
+      effortLevel: updated.effortLevel,
+      durationMinutes: updated.durationMinutes,
+      pointsEarned: updated.pointsEarned,
+      note: updated.note ?? null,
+      commentCount: 0,
+      reactions: [],
+      createdAt: updated.createdAt.toISOString(),
+    };
+  }
+
+  async remove(userId: string, logId: string) {
+    const log = await this.prisma.activityLog.findUnique({
+      where: { id: logId },
+    });
+    if (!log) throw new NotFoundException('Activity log not found');
+    if (log.userId !== userId) throw new ForbiddenException('Not your activity log');
+
+    await this.prisma.$transaction([
+      this.prisma.activityLog.delete({ where: { id: logId } }),
+      this.prisma.user.update({
+        where: { id: userId },
+        data: { totalPoints: { decrement: log.pointsEarned } },
+      }),
+    ]);
   }
 
   private calculatePoints(activityType: any, dto: CreateActivityLogDto): number {

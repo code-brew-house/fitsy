@@ -64,6 +64,9 @@ export class DashboardService {
       effortLevel: log.effortLevel as any,
       durationMinutes: log.durationMinutes,
       pointsEarned: log.pointsEarned,
+      note: (log as any).note ?? null,
+      commentCount: 0,
+      reactions: [],
       createdAt: log.createdAt.toISOString(),
     }));
 

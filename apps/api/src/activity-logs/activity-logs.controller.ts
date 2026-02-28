@@ -2,15 +2,19 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Delete,
   Body,
   Query,
+  Param,
   UseGuards,
   Request,
+  HttpCode,
 } from '@nestjs/common';
 import { ActivityLogsService } from './activity-logs.service';
 import { FamilyService } from '../family/family.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { createActivityLogSchema } from '@fitsy/shared';
+import { createActivityLogSchema, updateActivityLogSchema } from '@fitsy/shared';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
 @Controller('activity-logs')
@@ -51,5 +55,20 @@ export class ActivityLogsController {
   ) {
     const familyId = await this.familyService.getUserFamilyId(req.user.userId);
     return this.activityLogsService.findFeed(familyId, parseInt(limit ?? '20', 10));
+  }
+
+  @Patch(':id')
+  async update(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateActivityLogSchema)) body: any,
+  ) {
+    return this.activityLogsService.update(req.user.userId, id, body);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async remove(@Request() req: any, @Param('id') id: string) {
+    await this.activityLogsService.remove(req.user.userId, id);
   }
 }
