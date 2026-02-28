@@ -17,11 +17,12 @@ export class RewardsService {
     return user.familyId;
   }
 
-  async findAll(familyId: string) {
-    return this.prisma.reward.findMany({
-      where: { familyId, isActive: true },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(familyId: string, includeInactive: boolean = false) {
+    const where: any = { familyId };
+    if (!includeInactive) {
+      where.isActive = true;
+    }
+    return this.prisma.reward.findMany({ where, orderBy: { createdAt: 'desc' } });
   }
 
   async create(familyId: string, dto: CreateRewardDto) {

@@ -22,7 +22,25 @@ describe('RedemptionsService', () => {
     isActive: true,
   };
 
+  let txUserFindUnique: jest.Mock;
+  let txRewardFindUnique: jest.Mock;
+  let txRedemptionCreate: jest.Mock;
+  let txUserUpdate: jest.Mock;
+  let txRewardUpdate: jest.Mock;
+
   beforeEach(async () => {
+    txUserFindUnique = jest.fn();
+    txRewardFindUnique = jest.fn();
+    txRedemptionCreate = jest.fn().mockResolvedValue({
+      id: 'redemption-1',
+      userId: 'user-1',
+      rewardId: 'reward-1',
+      pointsSpent: 50,
+      status: 'PENDING',
+    });
+    txUserUpdate = jest.fn();
+    txRewardUpdate = jest.fn();
+
     prisma = {
       user: {
         findUnique: jest.fn(),
@@ -40,24 +58,20 @@ describe('RedemptionsService', () => {
       },
       $transaction: jest.fn((fn) =>
         fn({
+          user: {
+            findUnique: txUserFindUnique,
+            update: txUserUpdate,
+          },
+          reward: {
+            findUnique: txRewardFindUnique,
+            update: txRewardUpdate,
+          },
           redemption: {
-            create: jest.fn().mockResolvedValue({
-              id: 'redemption-1',
-              userId: 'user-1',
-              rewardId: 'reward-1',
-              pointsSpent: 50,
-              status: 'PENDING',
-            }),
+            create: txRedemptionCreate,
             update: jest.fn().mockResolvedValue({
               id: 'redemption-1',
               status: 'CANCELLED',
             }),
-          },
-          user: {
-            update: jest.fn(),
-          },
-          reward: {
-            updateMany: jest.fn().mockResolvedValue({ count: 1 }),
           },
         }),
       ),
@@ -75,8 +89,8 @@ describe('RedemptionsService', () => {
 
   describe('create', () => {
     it('should create a redemption and deduct points', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
-      prisma.reward.findUnique.mockResolvedValue(mockReward);
+      txUserFindUnique.mockResolvedValue(mockUser);
+      txRewardFindUnique.mockResolvedValue(mockReward);
 
       const result = await service.create('user-1', { rewardId: 'reward-1' });
 
@@ -86,16 +100,18 @@ describe('RedemptionsService', () => {
         rewardId: 'reward-1',
         pointsSpent: 50,
         status: 'PENDING',
+        rewardName: 'Movie Night',
+        userName: '',
       });
       expect(prisma.$transaction).toHaveBeenCalled();
     });
 
     it('should throw BadRequestException if insufficient points', async () => {
-      prisma.user.findUnique.mockResolvedValue({
+      txUserFindUnique.mockResolvedValue({
         ...mockUser,
         totalPoints: 10,
       });
-      prisma.reward.findUnique.mockResolvedValue(mockReward);
+      txRewardFindUnique.mockResolvedValue(mockReward);
 
       await expect(
         service.create('user-1', { rewardId: 'reward-1' }),
@@ -103,8 +119,8 @@ describe('RedemptionsService', () => {
     });
 
     it('should throw NotFoundException if reward is inactive', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
-      prisma.reward.findUnique.mockResolvedValue({
+      txUserFindUnique.mockResolvedValue(mockUser);
+      txRewardFindUnique.mockResolvedValue({
         ...mockReward,
         isActive: false,
       });
@@ -115,8 +131,8 @@ describe('RedemptionsService', () => {
     });
 
     it('should throw BadRequestException if reward is out of stock', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
-      prisma.reward.findUnique.mockResolvedValue({
+      txUserFindUnique.mockResolvedValue(mockUser);
+      txRewardFindUnique.mockResolvedValue({
         ...mockReward,
         quantity: 0,
       });
@@ -127,8 +143,8 @@ describe('RedemptionsService', () => {
     });
 
     it('should throw NotFoundException if reward belongs to different family', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
-      prisma.reward.findUnique.mockResolvedValue({
+      txUserFindUnique.mockResolvedValue(mockUser);
+      txRewardFindUnique.mockResolvedValue({
         ...mockReward,
         familyId: 'other-family',
       });
@@ -143,6 +159,7 @@ describe('RedemptionsService', () => {
     it('should change redemption status to FULFILLED', async () => {
       prisma.redemption.findUnique.mockResolvedValue({
         id: 'redemption-1',
+        status: 'PENDING',
         reward: { familyId: 'family-1' },
       });
       prisma.redemption.update.mockResolvedValue({
@@ -154,9 +171,22 @@ describe('RedemptionsService', () => {
       expect(result.status).toBe('FULFILLED');
     });
 
+    it('should throw BadRequestException if redemption is not PENDING', async () => {
+      prisma.redemption.findUnique.mockResolvedValue({
+        id: 'redemption-1',
+        status: 'FULFILLED',
+        reward: { familyId: 'family-1' },
+      });
+
+      await expect(
+        service.fulfill('family-1', 'redemption-1'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it('should throw NotFoundException if redemption not in family', async () => {
       prisma.redemption.findUnique.mockResolvedValue({
         id: 'redemption-1',
+        status: 'PENDING',
         reward: { familyId: 'other-family' },
       });
 

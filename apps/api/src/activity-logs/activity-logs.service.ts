@@ -14,6 +14,14 @@ export class ActivityLogsService {
       throw new NotFoundException('Activity type not found');
     }
 
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { familyId: true },
+    });
+    if (!user || user.familyId !== activityType.familyId) {
+      throw new NotFoundException('Activity type not found');
+    }
+
     const pointsEarned = this.calculatePoints(activityType, dto);
 
     const [log] = await this.prisma.$transaction([
@@ -40,29 +48,78 @@ export class ActivityLogsService {
     return log;
   }
 
-  async findOwn(userId: string, page: number, limit: number) {
-    const skip = (page - 1) * limit;
-    return this.prisma.activityLog.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: limit,
-      include: {
-        activityType: { select: { name: true, icon: true } },
-      },
-    });
+  async findOwn(userId: string, page: number = 1, limit: number = 20, activityTypeId?: string) {
+    const where: any = { userId };
+    if (activityTypeId) {
+      where.activityTypeId = activityTypeId;
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.activityLog.findMany({
+        where,
+        include: {
+          activityType: { select: { name: true, icon: true } },
+          user: { select: { name: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.activityLog.count({ where }),
+    ]);
+
+    return {
+      data: data.map((log) => ({
+        id: log.id,
+        userId: log.userId,
+        userName: log.user.name,
+        activityTypeId: log.activityTypeId,
+        activityTypeName: log.activityType.name,
+        activityTypeIcon: log.activityType.icon,
+        measurementType: log.measurementType,
+        distanceKm: log.distanceKm,
+        effortLevel: log.effortLevel,
+        durationMinutes: log.durationMinutes,
+        pointsEarned: log.pointsEarned,
+        createdAt: log.createdAt.toISOString(),
+      })),
+      total,
+      page,
+      limit,
+    };
   }
 
-  async findFeed(familyId: string, limit: number) {
-    return this.prisma.activityLog.findMany({
-      where: { user: { familyId } },
+  async findFeed(familyId: string, limit: number = 20) {
+    const users = await this.prisma.user.findMany({
+      where: { familyId },
+      select: { id: true },
+    });
+    const userIds = users.map((u) => u.id);
+
+    const logs = await this.prisma.activityLog.findMany({
+      where: { userId: { in: userIds } },
+      include: {
+        activityType: { select: { name: true, icon: true } },
+        user: { select: { name: true } },
+      },
       orderBy: { createdAt: 'desc' },
       take: limit,
-      include: {
-        user: { select: { name: true } },
-        activityType: { select: { name: true, icon: true } },
-      },
     });
+
+    return logs.map((log) => ({
+      id: log.id,
+      userId: log.userId,
+      userName: log.user.name,
+      activityTypeId: log.activityTypeId,
+      activityTypeName: log.activityType.name,
+      activityTypeIcon: log.activityType.icon,
+      measurementType: log.measurementType,
+      distanceKm: log.distanceKm,
+      effortLevel: log.effortLevel,
+      durationMinutes: log.durationMinutes,
+      pointsEarned: log.pointsEarned,
+      createdAt: log.createdAt.toISOString(),
+    }));
   }
 
   private calculatePoints(activityType: any, dto: CreateActivityLogDto): number {

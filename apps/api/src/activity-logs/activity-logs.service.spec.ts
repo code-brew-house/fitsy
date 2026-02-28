@@ -16,8 +16,11 @@ describe('ActivityLogsService', () => {
       activityLog: {
         create: jest.fn(),
         findMany: jest.fn(),
+        count: jest.fn(),
       },
       user: {
+        findUnique: jest.fn(),
+        findMany: jest.fn(),
         update: jest.fn(),
       },
       $transaction: jest.fn((args: any[]) => Promise.all(args)),
@@ -34,6 +37,10 @@ describe('ActivityLogsService', () => {
   });
 
   describe('create', () => {
+    beforeEach(() => {
+      prisma.user.findUnique.mockResolvedValue({ familyId: 'family-1' });
+    });
+
     it('should calculate DISTANCE points: 5km running at 1pt/km = 5 pts', async () => {
       prisma.activityType.findUnique.mockResolvedValue({
         id: 'at-1',
@@ -41,6 +48,7 @@ describe('ActivityLogsService', () => {
         measurementType: 'DISTANCE',
         pointsPerUnit: 1,
         isActive: true,
+        familyId: 'family-1',
       });
 
       const logResult = {
@@ -82,6 +90,7 @@ describe('ActivityLogsService', () => {
         pointsHigh: 8,
         pointsExtreme: 12,
         isActive: true,
+        familyId: 'family-1',
       });
 
       const logResult = {
@@ -112,6 +121,7 @@ describe('ActivityLogsService', () => {
         measurementType: 'FLAT',
         flatPoints: 5,
         isActive: true,
+        familyId: 'family-1',
       });
 
       const logResult = {
@@ -141,6 +151,7 @@ describe('ActivityLogsService', () => {
         measurementType: 'DURATION',
         pointsPerMinute: 0.067,
         isActive: true,
+        familyId: 'family-1',
       });
 
       const logResult = {
@@ -171,6 +182,7 @@ describe('ActivityLogsService', () => {
         measurementType: 'DISTANCE',
         pointsPerUnit: 1,
         isActive: true,
+        familyId: 'family-1',
       });
       prisma.activityLog.create.mockResolvedValue({ id: 'log-5', pointsEarned: 10 });
       prisma.user.update.mockResolvedValue({ id: 'user-1', totalPoints: 110 });
@@ -193,36 +205,95 @@ describe('ActivityLogsService', () => {
         service.create('user-1', { activityTypeId: 'nonexistent' }),
       ).rejects.toThrow(NotFoundException);
     });
+
+    it('should throw NotFoundException if user familyId does not match activity type familyId', async () => {
+      prisma.activityType.findUnique.mockResolvedValue({
+        id: 'at-1',
+        name: 'Running',
+        measurementType: 'DISTANCE',
+        pointsPerUnit: 1,
+        isActive: true,
+        familyId: 'other-family',
+      });
+
+      await expect(
+        service.create('user-1', { activityTypeId: 'at-1', distanceKm: 5 }),
+      ).rejects.toThrow(NotFoundException);
+    });
   });
 
   describe('findOwn', () => {
     it('should return paginated activity logs for the user', async () => {
+      const now = new Date();
       const mockLogs = [
-        { id: 'log-1', pointsEarned: 5, activityType: { name: 'Running', icon: '\u{1F3C3}' } },
+        {
+          id: 'log-1',
+          userId: 'user-1',
+          activityTypeId: 'at-1',
+          measurementType: 'DISTANCE',
+          distanceKm: 5,
+          effortLevel: null,
+          durationMinutes: null,
+          pointsEarned: 5,
+          createdAt: now,
+          activityType: { name: 'Running', icon: '\u{1F3C3}' },
+          user: { name: 'Alice' },
+        },
       ];
       prisma.activityLog.findMany.mockResolvedValue(mockLogs);
+      prisma.activityLog.count.mockResolvedValue(1);
 
       const result = await service.findOwn('user-1', 1, 20);
 
-      expect(result).toEqual(mockLogs);
+      expect(result).toEqual({
+        data: [
+          {
+            id: 'log-1',
+            userId: 'user-1',
+            userName: 'Alice',
+            activityTypeId: 'at-1',
+            activityTypeName: 'Running',
+            activityTypeIcon: '\u{1F3C3}',
+            measurementType: 'DISTANCE',
+            distanceKm: 5,
+            effortLevel: null,
+            durationMinutes: null,
+            pointsEarned: 5,
+            createdAt: now.toISOString(),
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 20,
+      });
       expect(prisma.activityLog.findMany).toHaveBeenCalledWith({
         where: { userId: 'user-1' },
+        include: {
+          activityType: { select: { name: true, icon: true } },
+          user: { select: { name: true } },
+        },
         orderBy: { createdAt: 'desc' },
         skip: 0,
         take: 20,
-        include: {
-          activityType: { select: { name: true, icon: true } },
-        },
       });
     });
   });
 
   describe('findFeed', () => {
     it('should return recent activity logs for the whole family', async () => {
+      const now = new Date();
+      prisma.user.findMany.mockResolvedValue([{ id: 'user-1' }, { id: 'user-2' }]);
       const mockLogs = [
         {
           id: 'log-1',
+          userId: 'user-1',
+          activityTypeId: 'at-1',
+          measurementType: 'DISTANCE',
+          distanceKm: 5,
+          effortLevel: null,
+          durationMinutes: null,
           pointsEarned: 5,
+          createdAt: now,
           user: { name: 'Alice' },
           activityType: { name: 'Running', icon: '\u{1F3C3}' },
         },
@@ -231,15 +302,34 @@ describe('ActivityLogsService', () => {
 
       const result = await service.findFeed('family-1', 20);
 
-      expect(result).toEqual(mockLogs);
+      expect(result).toEqual([
+        {
+          id: 'log-1',
+          userId: 'user-1',
+          userName: 'Alice',
+          activityTypeId: 'at-1',
+          activityTypeName: 'Running',
+          activityTypeIcon: '\u{1F3C3}',
+          measurementType: 'DISTANCE',
+          distanceKm: 5,
+          effortLevel: null,
+          durationMinutes: null,
+          pointsEarned: 5,
+          createdAt: now.toISOString(),
+        },
+      ]);
+      expect(prisma.user.findMany).toHaveBeenCalledWith({
+        where: { familyId: 'family-1' },
+        select: { id: true },
+      });
       expect(prisma.activityLog.findMany).toHaveBeenCalledWith({
-        where: { user: { familyId: 'family-1' } },
+        where: { userId: { in: ['user-1', 'user-2'] } },
+        include: {
+          activityType: { select: { name: true, icon: true } },
+          user: { select: { name: true } },
+        },
         orderBy: { createdAt: 'desc' },
         take: 20,
-        include: {
-          user: { select: { name: true } },
-          activityType: { select: { name: true, icon: true } },
-        },
       });
     });
   });

@@ -6,10 +6,12 @@ import { CreateActivityTypeDto, UpdateActivityTypeDto } from '@fitsy/shared';
 export class ActivityTypesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(familyId: string) {
-    return this.prisma.activityType.findMany({
-      where: { familyId, isActive: true },
-    });
+  async findAll(familyId: string, includeInactive: boolean = false) {
+    const where: any = { familyId };
+    if (!includeInactive) {
+      where.isActive = true;
+    }
+    return this.prisma.activityType.findMany({ where, orderBy: { createdAt: 'asc' } });
   }
 
   async create(familyId: string, dto: CreateActivityTypeDto) {

@@ -34,11 +34,13 @@ export class ActivityLogsController {
     @Request() req: any,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
+    @Query('activityTypeId') activityTypeId?: string,
   ) {
     return this.activityLogsService.findOwn(
       req.user.userId,
-      parseInt(page ?? '1', 10),
-      parseInt(limit ?? '20', 10),
+      page ? parseInt(page) : 1,
+      limit ? parseInt(limit) : 20,
+      activityTypeId,
     );
   }
 

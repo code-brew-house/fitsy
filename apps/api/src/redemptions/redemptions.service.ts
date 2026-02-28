@@ -23,30 +23,21 @@ export class RedemptionsService {
   }
 
   async create(userId: string, dto: CreateRedemptionDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, totalPoints: true, familyId: true },
-    });
-    if (!user || !user.familyId) {
-      throw new ForbiddenException('User is not part of a family');
-    }
-
-    const reward = await this.prisma.reward.findUnique({
-      where: { id: dto.rewardId },
-    });
-    if (!reward || !reward.isActive || reward.familyId !== user.familyId) {
-      throw new NotFoundException('Reward not found or inactive');
-    }
-
-    if (user.totalPoints < reward.pointCost) {
-      throw new BadRequestException('Insufficient points');
-    }
-
-    if (reward.quantity !== null && reward.quantity <= 0) {
-      throw new BadRequestException('Reward is out of stock');
-    }
-
     return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { id: userId },
+        select: { id: true, totalPoints: true, familyId: true },
+      });
+      if (!user) throw new NotFoundException('User not found');
+
+      const reward = await tx.reward.findUnique({
+        where: { id: dto.rewardId },
+      });
+      if (!reward || !reward.isActive) throw new NotFoundException('Reward not found');
+      if (reward.familyId !== user.familyId) throw new NotFoundException('Reward not found');
+      if (user.totalPoints < reward.pointCost) throw new BadRequestException('Insufficient points');
+      if (reward.quantity !== null && reward.quantity <= 0) throw new BadRequestException('Reward out of stock');
+
       const redemption = await tx.redemption.create({
         data: {
           userId,
@@ -62,16 +53,17 @@ export class RedemptionsService {
       });
 
       if (reward.quantity !== null) {
-        const updated = await tx.reward.updateMany({
-          where: { id: dto.rewardId, quantity: { gt: 0 } },
+        await tx.reward.update({
+          where: { id: dto.rewardId },
           data: { quantity: { decrement: 1 } },
         });
-        if (updated.count === 0) {
-          throw new BadRequestException('Reward is out of stock');
-        }
       }
 
-      return redemption;
+      return {
+        ...redemption,
+        rewardName: reward.name,
+        userName: '',
+      };
     });
   }
 
@@ -106,6 +98,9 @@ export class RedemptionsService {
     if (!redemption || redemption.reward.familyId !== familyId) {
       throw new NotFoundException('Redemption not found');
     }
+    if (redemption.status !== 'PENDING') {
+      throw new BadRequestException('Only pending redemptions can be fulfilled');
+    }
 
     return this.prisma.redemption.update({
       where: { id: redemptionId },
@@ -120,6 +115,9 @@ export class RedemptionsService {
     });
     if (!redemption || redemption.reward.familyId !== familyId) {
       throw new NotFoundException('Redemption not found');
+    }
+    if (redemption.status !== 'PENDING') {
+      throw new BadRequestException('Only pending redemptions can be cancelled');
     }
 
     return this.prisma.$transaction(async (tx) => {

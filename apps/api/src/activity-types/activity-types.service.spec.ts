@@ -41,6 +41,7 @@ describe('ActivityTypesService', () => {
       expect(result).toEqual(mockTypes);
       expect(prisma.activityType.findMany).toHaveBeenCalledWith({
         where: { familyId: 'family-1', isActive: true },
+        orderBy: { createdAt: 'asc' },
       });
     });
   });

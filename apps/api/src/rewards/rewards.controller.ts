@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -22,9 +23,12 @@ export class RewardsController {
   constructor(private rewardsService: RewardsService) {}
 
   @Get()
-  async findAll(@Request() req: any) {
+  async findAll(
+    @Request() req: any,
+    @Query('includeInactive') includeInactive?: string,
+  ) {
     const familyId = await this.rewardsService.getFamilyIdForUser(req.user.userId);
-    return this.rewardsService.findAll(familyId);
+    return this.rewardsService.findAll(familyId, includeInactive === 'true');
   }
 
   @Post()

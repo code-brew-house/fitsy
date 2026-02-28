@@ -121,6 +121,7 @@ export default function AdminActivitiesPage() {
     switch (form.measurementType) {
       case MeasurementType.DISTANCE:
         body.pointsPerUnit = Number(form.pointsPerUnit) || undefined;
+        body.unit = 'km';
         break;
       case MeasurementType.EFFORT:
         body.pointsLow = Number(form.pointsLow) || undefined;

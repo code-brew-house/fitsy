@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -26,9 +27,12 @@ export class ActivityTypesController {
   ) {}
 
   @Get()
-  async findAll(@Request() req: any) {
+  async findAll(
+    @Request() req: any,
+    @Query('includeInactive') includeInactive?: string,
+  ) {
     const familyId = await this.familyService.getUserFamilyId(req.user.userId);
-    return this.activityTypesService.findAll(familyId);
+    return this.activityTypesService.findAll(familyId, includeInactive === 'true');
   }
 
   @Post()
