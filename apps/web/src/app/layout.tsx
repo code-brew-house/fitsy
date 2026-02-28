@@ -4,6 +4,7 @@ import '@mantine/notifications/styles.css';
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { theme } from '../theme';
+import { AuthProvider } from '../lib/auth-context';
 
 export const metadata = {
   title: 'Fitsy — Family Fitness Tracker',
@@ -22,7 +23,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <MantineProvider theme={theme} defaultColorScheme="auto">
           <Notifications position="top-right" />
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </MantineProvider>
       </body>
     </html>
