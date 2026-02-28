@@ -21,6 +21,7 @@ import {
   IconGift,
   IconTrophy,
   IconHistory,
+  IconListDetails,
   IconReceipt,
   IconUser,
   IconSettings,
@@ -40,6 +41,7 @@ const mainNav = [
 ];
 
 const secondaryNav = [
+  { label: 'My Activities', icon: IconListDetails, href: '/my-activities' },
   { label: 'History', icon: IconHistory, href: '/history' },
   { label: 'Redemptions', icon: IconReceipt, href: '/redemptions' },
   { label: 'Profile', icon: IconUser, href: '/profile' },
