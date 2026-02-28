@@ -8,6 +8,7 @@ import { RewardsModule } from './rewards/rewards.module';
 import { RedemptionsModule } from './redemptions/redemptions.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     RedemptionsModule,
     LeaderboardModule,
     DashboardModule,
+    CommentsModule,
   ],
 })
 export class AppModule {}
