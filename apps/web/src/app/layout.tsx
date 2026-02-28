@@ -5,6 +5,7 @@ import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/c
 import { Notifications } from '@mantine/notifications';
 import { theme } from '../theme';
 import { AuthProvider } from '../lib/auth-context';
+import { ServiceWorkerRegistration } from '../components/ServiceWorkerRegistration';
 
 export const metadata = {
   title: 'Fitsy — Family Fitness Tracker',
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no" />
       </head>
       <body>
+        <ServiceWorkerRegistration />
         <MantineProvider theme={theme} defaultColorScheme="auto">
           <Notifications position="top-right" />
           <AuthProvider>
