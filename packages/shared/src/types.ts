@@ -11,6 +11,10 @@ export type UpdateFamilyDto = z.infer<typeof schemas.updateFamilySchema>;
 export type CreateActivityTypeDto = z.infer<typeof schemas.createActivityTypeSchema>;
 export type UpdateActivityTypeDto = z.infer<typeof schemas.updateActivityTypeSchema>;
 export type CreateActivityLogDto = z.infer<typeof schemas.createActivityLogSchema>;
+export type UpdateActivityLogDto = z.infer<typeof schemas.updateActivityLogSchema>;
+export type CreateCommentDto = z.infer<typeof schemas.createCommentSchema>;
+export type UpdateCommentDto = z.infer<typeof schemas.updateCommentSchema>;
+export type ToggleReactionDto = z.infer<typeof schemas.toggleReactionSchema>;
 export type CreateRewardDto = z.infer<typeof schemas.createRewardSchema>;
 export type UpdateRewardDto = z.infer<typeof schemas.updateRewardSchema>;
 export type CreateRedemptionDto = z.infer<typeof schemas.createRedemptionSchema>;
@@ -64,6 +68,9 @@ export interface ActivityLogResponse {
   effortLevel: EffortLevel | null;
   durationMinutes: number | null;
   pointsEarned: number;
+  note: string | null;
+  commentCount: number;
+  reactions: ReactionSummary[];
   createdAt: string;
 }
 
@@ -108,4 +115,19 @@ export interface DashboardResponse {
 export interface AuthResponse {
   accessToken: string;
   user: UserResponse;
+}
+
+export interface CommentResponse {
+  id: string;
+  userId: string;
+  userName: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReactionSummary {
+  emoji: string;
+  count: number;
+  userReacted: boolean;
 }

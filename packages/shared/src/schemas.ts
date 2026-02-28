@@ -50,6 +50,7 @@ export const createActivityLogSchema = z.object({
   distanceKm: z.number().positive().optional(),
   effortLevel: z.nativeEnum(EffortLevel).optional(),
   durationMinutes: z.number().int().positive().optional(),
+  note: z.string().max(500).optional(),
 });
 
 // Rewards
@@ -66,6 +67,30 @@ export const updateRewardSchema = createRewardSchema.partial();
 // Redemptions
 export const createRedemptionSchema = z.object({
   rewardId: z.string().uuid(),
+});
+
+// Activity Log Update
+export const updateActivityLogSchema = z.object({
+  distanceKm: z.number().positive().optional(),
+  effortLevel: z.nativeEnum(EffortLevel).optional(),
+  durationMinutes: z.number().int().positive().optional(),
+  note: z.string().max(500).optional().nullable(),
+});
+
+// Comments
+export const createCommentSchema = z.object({
+  text: z.string().min(1).max(500),
+});
+
+export const updateCommentSchema = z.object({
+  text: z.string().min(1).max(500),
+});
+
+// Reactions
+export const ALLOWED_EMOJIS = ['👍', '🔥', '🎉', '💪', '❤️'] as const;
+
+export const toggleReactionSchema = z.object({
+  emoji: z.enum(ALLOWED_EMOJIS),
 });
 
 // Leaderboard
