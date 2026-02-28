@@ -92,6 +92,8 @@ describe('RedemptionsService', () => {
       txUserFindUnique.mockResolvedValue(mockUser);
       txRewardFindUnique.mockResolvedValue(mockReward);
 
+      txUserFindUnique.mockResolvedValueOnce(mockUser).mockResolvedValueOnce({ name: 'Test User' });
+
       const result = await service.create('user-1', { rewardId: 'reward-1' });
 
       expect(result).toEqual({
@@ -101,7 +103,7 @@ describe('RedemptionsService', () => {
         pointsSpent: 50,
         status: 'PENDING',
         rewardName: 'Movie Night',
-        userName: '',
+        userName: 'Test User',
       });
       expect(prisma.$transaction).toHaveBeenCalled();
     });
@@ -197,19 +199,33 @@ describe('RedemptionsService', () => {
   });
 
   describe('findOwn', () => {
-    it('should return user redemptions', async () => {
-      const mockRedemptions = [
+    it('should return user redemptions with flattened names', async () => {
+      prisma.user.findUnique.mockResolvedValue({ name: 'Test User' });
+      prisma.redemption.findMany.mockResolvedValue([
         {
           id: 'redemption-1',
+          userId: 'user-1',
+          rewardId: 'reward-1',
           reward: { name: 'Movie Night' },
           pointsSpent: 50,
           status: 'PENDING',
+          createdAt: '2026-02-28T00:00:00.000Z',
         },
-      ];
-      prisma.redemption.findMany.mockResolvedValue(mockRedemptions);
+      ]);
 
       const result = await service.findOwn('user-1');
-      expect(result).toEqual(mockRedemptions);
+      expect(result).toEqual([
+        {
+          id: 'redemption-1',
+          userId: 'user-1',
+          userName: 'Test User',
+          rewardId: 'reward-1',
+          rewardName: 'Movie Night',
+          pointsSpent: 50,
+          status: 'PENDING',
+          createdAt: '2026-02-28T00:00:00.000Z',
+        },
+      ]);
       expect(prisma.redemption.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { userId: 'user-1' } }),
       );

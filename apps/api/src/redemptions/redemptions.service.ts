@@ -59,26 +59,45 @@ export class RedemptionsService {
         });
       }
 
+      const creator = await tx.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+      });
+
       return {
         ...redemption,
         rewardName: reward.name,
-        userName: '',
+        userName: creator?.name ?? '',
       };
     });
   }
 
   async findOwn(userId: string) {
-    return this.prisma.redemption.findMany({
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true },
+    });
+    const redemptions = await this.prisma.redemption.findMany({
       where: { userId },
       include: {
         reward: { select: { name: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
+    return redemptions.map((r) => ({
+      id: r.id,
+      userId: r.userId,
+      userName: user?.name ?? '',
+      rewardId: r.rewardId,
+      rewardName: r.reward.name,
+      pointsSpent: r.pointsSpent,
+      status: r.status,
+      createdAt: r.createdAt,
+    }));
   }
 
   async findAll(familyId: string) {
-    return this.prisma.redemption.findMany({
+    const redemptions = await this.prisma.redemption.findMany({
       where: {
         reward: { familyId },
       },
@@ -88,6 +107,16 @@ export class RedemptionsService {
       },
       orderBy: { createdAt: 'desc' },
     });
+    return redemptions.map((r) => ({
+      id: r.id,
+      userId: r.userId,
+      userName: r.user.name,
+      rewardId: r.rewardId,
+      rewardName: r.reward.name,
+      pointsSpent: r.pointsSpent,
+      status: r.status,
+      createdAt: r.createdAt,
+    }));
   }
 
   async fulfill(familyId: string, redemptionId: string) {
