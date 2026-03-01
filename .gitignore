@@ -13,3 +13,5 @@ dist/
 .playwright-mcp/
 *.png
 apps/web/tsconfig.tsbuildinfo
+apps/web/public/sw.js
+apps/web/public/workbox-*.js
