@@ -32,6 +32,7 @@ import { Role } from '@fitsy/shared';
 import { useAuth } from '../lib/auth-context';
 import { ThemeToggle } from './ThemeToggle';
 import { PointsBadge } from './PointsBadge';
+import { FitsyLogo } from './FitsyLogo';
 
 const mainNav = [
   { label: 'Dashboard', icon: IconDashboard, href: '/dashboard' },
@@ -89,15 +90,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <IconMenu2 size={18} />
             </ActionIcon>
-            <Text
-              size="xl"
-              fw={700}
-              c="teal"
+            <Group
+              gap="xs"
+              align="center"
               style={{ cursor: 'pointer' }}
               onClick={() => navigate('/dashboard')}
             >
-              Fitsy
-            </Text>
+              <FitsyLogo size={32} />
+              <Text size="xl" fw={800} c="teal" style={{ letterSpacing: '-0.01em' }}>
+                Fitsy
+              </Text>
+            </Group>
           </Group>
           <Group gap="sm">
             <PointsBadge />
