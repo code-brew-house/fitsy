@@ -14,12 +14,11 @@ import {
   Stack,
   Paper,
   Divider,
-  Box,
 } from '@mantine/core';
 import { IconTrophy } from '@tabler/icons-react';
 import { api } from '../../../lib/api';
 import type { LeaderboardEntry, ActivityLogResponse } from '@fitsy/shared';
-import { MeasurementType } from '@fitsy/shared';
+import { FeedItem } from '../../../components/FeedItem';
 
 function rankDecoration(rank: number): { borderColor: string; label: string } | null {
   switch (rank) {
@@ -45,31 +44,6 @@ function rankDisplay(rank: number): string {
     default:
       return `${rank}th`;
   }
-}
-
-function formatMeasurement(log: ActivityLogResponse): string {
-  switch (log.measurementType) {
-    case MeasurementType.DISTANCE:
-      return log.distanceKm ? `${log.distanceKm} km` : '';
-    case MeasurementType.EFFORT:
-      return log.effortLevel
-        ? log.effortLevel.charAt(0) + log.effortLevel.slice(1).toLowerCase()
-        : '';
-    case MeasurementType.DURATION:
-      return log.durationMinutes ? `${log.durationMinutes} min` : '';
-    default:
-      return '';
-  }
-}
-
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
 }
 
 export default function LeaderboardPage() {
@@ -201,31 +175,7 @@ export default function LeaderboardPage() {
           <Stack gap="xs">
             {feed.map((item) => (
               <Paper key={item.id} p="sm" withBorder radius="sm">
-                <Group justify="space-between">
-                  <Group gap="sm">
-                    <Avatar color="teal" radius="xl" size="sm">
-                      {item.userName?.charAt(0)?.toUpperCase() || '?'}
-                    </Avatar>
-                    <Box>
-                      <Text size="sm">
-                        <Text component="span" fw={600}>
-                          {item.userName}
-                        </Text>{' '}
-                        logged{' '}
-                        <Text component="span" fw={500}>
-                          {item.activityTypeIcon} {item.activityTypeName}
-                        </Text>
-                        {formatMeasurement(item) ? ` (${formatMeasurement(item)})` : ''}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {timeAgo(item.createdAt)}
-                      </Text>
-                    </Box>
-                  </Group>
-                  <Text fw={600} c="teal" size="sm">
-                    +{item.pointsEarned} pts
-                  </Text>
-                </Group>
+                <FeedItem activity={item} />
               </Paper>
             ))}
           </Stack>
