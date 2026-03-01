@@ -7,7 +7,6 @@ import {
   Title,
   Table,
   SegmentedControl,
-  Avatar,
   Group,
   Text,
   Center,
@@ -20,6 +19,7 @@ import { IconTrophy } from '@tabler/icons-react';
 import { api } from '../../../lib/api';
 import type { LeaderboardEntry, ActivityLogResponse } from '@fitsy/shared';
 import { FeedItem } from '../../../components/FeedItem';
+import { UserLink } from '../../../components/UserLink';
 
 function rankDecoration(rank: number): { borderColor: string; label: string } | null {
   switch (rank) {
@@ -135,10 +135,7 @@ export default function LeaderboardPage() {
                       <Text fw={700} w={32} c={decoration ? undefined : 'dimmed'}>
                         {rankDisplay(rank)}
                       </Text>
-                      <Avatar src={entry.avatarUrl} color="teal" radius="xl" size="sm">
-                        {entry.userName?.charAt(0)?.toUpperCase() || '?'}
-                      </Avatar>
-                      <Text fw={500}>{entry.userName}</Text>
+                      <UserLink userId={entry.userId} name={entry.userName} avatarUrl={entry.avatarUrl} showAvatar fw={500} />
                     </Group>
                     <Stack align="flex-end" gap={0}>
                       <Text fw={600} c="teal">{entry.totalPoints} pts</Text>
@@ -176,17 +173,7 @@ export default function LeaderboardPage() {
                       {rankDisplay(rank)}
                     </Table.Td>
                     <Table.Td>
-                      <Group gap="sm">
-                        <Avatar
-                          src={entry.avatarUrl}
-                          color="teal"
-                          radius="xl"
-                          size="sm"
-                        >
-                          {entry.userName?.charAt(0)?.toUpperCase() || '?'}
-                        </Avatar>
-                        <Text fw={500}>{entry.userName}</Text>
-                      </Group>
+                      <UserLink userId={entry.userId} name={entry.userName} avatarUrl={entry.avatarUrl} showAvatar fw={500} />
                     </Table.Td>
                     <Table.Td ta="right" fw={600} c="teal">
                       {entry.totalPoints}
