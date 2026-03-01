@@ -122,7 +122,7 @@ export default function LogPage() {
       <Container size="lg">
         <Stack gap="md">
           <Skeleton height={30} width={200} />
-          <SimpleGrid cols={{ base: 2, md: 3 }}>
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} height={120} radius="md" />
             ))}
@@ -253,7 +253,7 @@ export default function LogPage() {
             </Text>
           </Paper>
         ) : (
-          <SimpleGrid cols={{ base: 2, md: 3 }}>
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
             {activityTypes.map((at) => (
               <ActivityCard
                 key={at.id}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   Container,
   Title,
@@ -31,6 +32,7 @@ interface MemberResponse extends UserResponse {
 
 export default function AdminMembersPage() {
   const { user: currentUser } = useAuth();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [family, setFamily] = useState<FamilyResponse | null>(null);
   const [members, setMembers] = useState<MemberResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,47 +137,77 @@ export default function AdminMembersPage() {
           </Paper>
         )}
 
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Email</Table.Th>
-              <Table.Th>Role</Table.Th>
-              <Table.Th>Points</Table.Th>
-              <Table.Th>Joined</Table.Th>
-              <Table.Th>Actions</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
+        {isMobile ? (
+          <Stack gap="sm">
+            {members.length === 0 && (
+              <Text c="dimmed" ta="center" py="md">No members found</Text>
+            )}
             {members.map((m) => (
-              <Table.Tr key={m.id}>
-                <Table.Td>{m.name}</Table.Td>
-                <Table.Td>{m.email}</Table.Td>
-                <Table.Td>
-                  <Badge color={m.role === Role.ADMIN ? 'blue' : 'gray'}>
-                    {m.role}
-                  </Badge>
-                </Table.Td>
-                <Table.Td>{m.totalPoints}</Table.Td>
-                <Table.Td>{new Date(m.createdAt).toLocaleDateString()}</Table.Td>
-                <Table.Td>
+              <Paper key={m.id} p="md" radius="md" withBorder>
+                <Group justify="space-between" align="flex-start" wrap="nowrap">
+                  <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
+                    <Group gap="xs">
+                      <Text fw={600}>{m.name}</Text>
+                      <Badge color={m.role === Role.ADMIN ? 'blue' : 'gray'} size="sm">{m.role}</Badge>
+                    </Group>
+                    <Text size="sm" c="dimmed" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.email}</Text>
+                    <Group gap="xs">
+                      <Text size="sm">{m.totalPoints} pts</Text>
+                      <Text size="xs" c="dimmed">· Joined {new Date(m.createdAt).toLocaleDateString()}</Text>
+                    </Group>
+                  </Stack>
                   {m.role !== Role.ADMIN && m.id !== currentUser?.id && (
-                    <ActionIcon variant="subtle" color="red" onClick={() => handleRemoveMember(m.id, m.name)}>
+                    <ActionIcon variant="subtle" color="red" onClick={() => handleRemoveMember(m.id, m.name)} style={{ flexShrink: 0 }}>
                       <IconTrash size={16} />
                     </ActionIcon>
                   )}
-                </Table.Td>
-              </Table.Tr>
+                </Group>
+              </Paper>
             ))}
-            {members.length === 0 && (
+          </Stack>
+        ) : (
+          <Table striped highlightOnHover>
+            <Table.Thead>
               <Table.Tr>
-                <Table.Td colSpan={6}>
-                  <Text c="dimmed" ta="center" py="md">No members found</Text>
-                </Table.Td>
+                <Table.Th>Name</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Role</Table.Th>
+                <Table.Th>Points</Table.Th>
+                <Table.Th>Joined</Table.Th>
+                <Table.Th>Actions</Table.Th>
               </Table.Tr>
-            )}
-          </Table.Tbody>
-        </Table>
+            </Table.Thead>
+            <Table.Tbody>
+              {members.map((m) => (
+                <Table.Tr key={m.id}>
+                  <Table.Td>{m.name}</Table.Td>
+                  <Table.Td>{m.email}</Table.Td>
+                  <Table.Td>
+                    <Badge color={m.role === Role.ADMIN ? 'blue' : 'gray'}>
+                      {m.role}
+                    </Badge>
+                  </Table.Td>
+                  <Table.Td>{m.totalPoints}</Table.Td>
+                  <Table.Td>{new Date(m.createdAt).toLocaleDateString()}</Table.Td>
+                  <Table.Td>
+                    {m.role !== Role.ADMIN && m.id !== currentUser?.id && (
+                      <ActionIcon variant="subtle" color="red" onClick={() => handleRemoveMember(m.id, m.name)}>
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    )}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+              {members.length === 0 && (
+                <Table.Tr>
+                  <Table.Td colSpan={6}>
+                    <Text c="dimmed" ta="center" py="md">No members found</Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
+          </Table>
+        )}
       </Stack>
     </Container>
   );

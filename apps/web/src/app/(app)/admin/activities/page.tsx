@@ -17,8 +17,9 @@ import {
   Text,
   Center,
   Loader,
+  Paper,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconEdit, IconTrash, IconToggleLeft, IconToggleRight } from '@tabler/icons-react';
 import { MeasurementType } from '@fitsy/shared';
@@ -67,6 +68,7 @@ function formatPointsConfig(at: ActivityTypeResponse): string {
 }
 
 export default function AdminActivitiesPage() {
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [activities, setActivities] = useState<ActivityTypeResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -213,33 +215,28 @@ export default function AdminActivitiesPage() {
           </Button>
         </Group>
 
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Icon</Table.Th>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Type</Table.Th>
-              <Table.Th>Points Config</Table.Th>
-              <Table.Th>Active</Table.Th>
-              <Table.Th>Actions</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
+        {isMobile ? (
+          <Stack gap="sm">
+            {activities.length === 0 && (
+              <Text c="dimmed" ta="center" py="md">No activity types found</Text>
+            )}
             {activities.map((at) => (
-              <Table.Tr key={at.id} style={{ opacity: at.isActive ? 1 : 0.5 }}>
-                <Table.Td><Text size="xl">{at.icon}</Text></Table.Td>
-                <Table.Td>{at.name}</Table.Td>
-                <Table.Td>
-                  <Badge variant="light" color="blue">{at.measurementType}</Badge>
-                </Table.Td>
-                <Table.Td><Text size="sm">{formatPointsConfig(at)}</Text></Table.Td>
-                <Table.Td>
-                  <Badge color={at.isActive ? 'teal' : 'gray'}>
-                    {at.isActive ? 'Active' : 'Inactive'}
-                  </Badge>
-                </Table.Td>
-                <Table.Td>
-                  <Group gap="xs">
+              <Paper key={at.id} p="md" radius="md" withBorder style={{ opacity: at.isActive ? 1 : 0.5 }}>
+                <Group justify="space-between" align="flex-start" wrap="nowrap">
+                  <Group gap="sm" align="flex-start" style={{ flex: 1, minWidth: 0 }}>
+                    <Text size="xl">{at.icon}</Text>
+                    <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
+                      <Text fw={600}>{at.name}</Text>
+                      <Group gap="xs">
+                        <Badge variant="light" color="blue" size="sm">{at.measurementType}</Badge>
+                        <Badge color={at.isActive ? 'teal' : 'gray'} size="sm">
+                          {at.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </Group>
+                      <Text size="xs" c="dimmed">{formatPointsConfig(at)}</Text>
+                    </Stack>
+                  </Group>
+                  <Group gap="xs" style={{ flexShrink: 0 }}>
                     <ActionIcon variant="subtle" color="blue" onClick={() => openEdit(at)}>
                       <IconEdit size={16} />
                     </ActionIcon>
@@ -250,18 +247,61 @@ export default function AdminActivitiesPage() {
                       <IconTrash size={16} />
                     </ActionIcon>
                   </Group>
-                </Table.Td>
-              </Table.Tr>
+                </Group>
+              </Paper>
             ))}
-            {activities.length === 0 && (
+          </Stack>
+        ) : (
+          <Table striped highlightOnHover>
+            <Table.Thead>
               <Table.Tr>
-                <Table.Td colSpan={6}>
-                  <Text c="dimmed" ta="center" py="md">No activity types found</Text>
-                </Table.Td>
+                <Table.Th>Icon</Table.Th>
+                <Table.Th>Name</Table.Th>
+                <Table.Th>Type</Table.Th>
+                <Table.Th>Points Config</Table.Th>
+                <Table.Th>Active</Table.Th>
+                <Table.Th>Actions</Table.Th>
               </Table.Tr>
-            )}
-          </Table.Tbody>
-        </Table>
+            </Table.Thead>
+            <Table.Tbody>
+              {activities.map((at) => (
+                <Table.Tr key={at.id} style={{ opacity: at.isActive ? 1 : 0.5 }}>
+                  <Table.Td><Text size="xl">{at.icon}</Text></Table.Td>
+                  <Table.Td>{at.name}</Table.Td>
+                  <Table.Td>
+                    <Badge variant="light" color="blue">{at.measurementType}</Badge>
+                  </Table.Td>
+                  <Table.Td><Text size="sm">{formatPointsConfig(at)}</Text></Table.Td>
+                  <Table.Td>
+                    <Badge color={at.isActive ? 'teal' : 'gray'}>
+                      {at.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </Table.Td>
+                  <Table.Td>
+                    <Group gap="xs">
+                      <ActionIcon variant="subtle" color="blue" onClick={() => openEdit(at)}>
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                      <ActionIcon variant="subtle" color={at.isActive ? 'orange' : 'teal'} onClick={() => handleToggleActive(at)}>
+                        {at.isActive ? <IconToggleRight size={16} /> : <IconToggleLeft size={16} />}
+                      </ActionIcon>
+                      <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(at.id, at.name)}>
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Group>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+              {activities.length === 0 && (
+                <Table.Tr>
+                  <Table.Td colSpan={6}>
+                    <Text c="dimmed" ta="center" py="md">No activity types found</Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
+          </Table>
+        )}
       </Stack>
 
       <Modal opened={opened} onClose={close} title={editingId ? 'Edit Activity Type' : 'Add Activity Type'} centered>

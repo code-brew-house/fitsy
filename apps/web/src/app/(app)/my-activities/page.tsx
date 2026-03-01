@@ -20,7 +20,7 @@ import {
   Textarea,
   Paper,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
   IconListDetails,
@@ -69,6 +69,7 @@ function formatDate(dateStr: string): string {
 
 export default function MyActivitiesPage() {
   const { refreshUser } = useAuth();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [logs, setLogs] = useState<ActivityLogResponse[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -240,7 +241,7 @@ export default function MyActivitiesPage() {
   return (
     <Container size="lg">
       <Stack gap="md">
-        <Group justify="space-between" align="flex-end">
+        <Group justify="space-between" align="flex-end" wrap="wrap">
           <Title order={2}>
             <Group gap="xs">
               <IconListDetails size={28} />
@@ -256,7 +257,7 @@ export default function MyActivitiesPage() {
               setPage(1);
             }}
             clearable
-            w={220}
+            w={{ base: '100%', sm: 220 }}
           />
         </Group>
 
@@ -275,57 +276,99 @@ export default function MyActivitiesPage() {
           </Center>
         ) : (
           <>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Date</Table.Th>
-                  <Table.Th>Activity</Table.Th>
-                  <Table.Th>Measurement</Table.Th>
-                  <Table.Th>Note</Table.Th>
-                  <Table.Th ta="right">Points</Table.Th>
-                  <Table.Th ta="center">Actions</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
+            {isMobile ? (
+              <Stack gap="sm">
                 {logs.map((log) => (
-                  <Table.Tr key={log.id}>
-                    <Table.Td>{formatDate(log.createdAt)}</Table.Td>
-                    <Table.Td>
-                      {log.activityTypeIcon} {log.activityTypeName}
-                    </Table.Td>
-                    <Table.Td>{formatMeasurement(log)}</Table.Td>
-                    <Table.Td>
-                      <Text size="sm" lineClamp={1} maw={200}>
-                        {log.note || '-'}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td ta="right" fw={600} c="teal">
-                      +{log.pointsEarned}
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap="xs" justify="center">
-                        <ActionIcon
-                          variant="subtle"
-                          color="blue"
-                          onClick={() => handleEditOpen(log)}
-                          title="Edit"
-                        >
-                          <IconEdit size={18} />
-                        </ActionIcon>
-                        <ActionIcon
-                          variant="subtle"
-                          color="red"
-                          onClick={() => handleDeleteOpen(log)}
-                          title="Delete"
-                        >
-                          <IconTrash size={18} />
-                        </ActionIcon>
-                      </Group>
-                    </Table.Td>
-                  </Table.Tr>
+                  <Paper key={log.id} p="md" radius="md" withBorder>
+                    <Group justify="space-between" align="flex-start" wrap="nowrap">
+                      <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
+                        <Text fw={600}>
+                          {log.activityTypeIcon} {log.activityTypeName}
+                        </Text>
+                        <Text size="xs" c="dimmed">{formatDate(log.createdAt)}</Text>
+                        <Text size="sm">{formatMeasurement(log)}</Text>
+                        {log.note && (
+                          <Text size="sm" c="dimmed" lineClamp={2}>{log.note}</Text>
+                        )}
+                      </Stack>
+                      <Stack align="flex-end" gap="xs" style={{ flexShrink: 0 }}>
+                        <Text fw={700} c="teal">+{log.pointsEarned} pts</Text>
+                        <Group gap="xs">
+                          <ActionIcon
+                            variant="subtle"
+                            color="blue"
+                            onClick={() => handleEditOpen(log)}
+                            title="Edit"
+                          >
+                            <IconEdit size={18} />
+                          </ActionIcon>
+                          <ActionIcon
+                            variant="subtle"
+                            color="red"
+                            onClick={() => handleDeleteOpen(log)}
+                            title="Delete"
+                          >
+                            <IconTrash size={18} />
+                          </ActionIcon>
+                        </Group>
+                      </Stack>
+                    </Group>
+                  </Paper>
                 ))}
-              </Table.Tbody>
-            </Table>
+              </Stack>
+            ) : (
+              <Table striped highlightOnHover>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Date</Table.Th>
+                    <Table.Th>Activity</Table.Th>
+                    <Table.Th>Measurement</Table.Th>
+                    <Table.Th>Note</Table.Th>
+                    <Table.Th ta="right">Points</Table.Th>
+                    <Table.Th ta="center">Actions</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {logs.map((log) => (
+                    <Table.Tr key={log.id}>
+                      <Table.Td>{formatDate(log.createdAt)}</Table.Td>
+                      <Table.Td>
+                        {log.activityTypeIcon} {log.activityTypeName}
+                      </Table.Td>
+                      <Table.Td>{formatMeasurement(log)}</Table.Td>
+                      <Table.Td>
+                        <Text size="sm" lineClamp={1} maw={200}>
+                          {log.note || '-'}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td ta="right" fw={600} c="teal">
+                        +{log.pointsEarned}
+                      </Table.Td>
+                      <Table.Td>
+                        <Group gap="xs" justify="center">
+                          <ActionIcon
+                            variant="subtle"
+                            color="blue"
+                            onClick={() => handleEditOpen(log)}
+                            title="Edit"
+                          >
+                            <IconEdit size={18} />
+                          </ActionIcon>
+                          <ActionIcon
+                            variant="subtle"
+                            color="red"
+                            onClick={() => handleDeleteOpen(log)}
+                            title="Delete"
+                          >
+                            <IconTrash size={18} />
+                          </ActionIcon>
+                        </Group>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            )}
 
             {totalPages > 1 && (
               <Center>

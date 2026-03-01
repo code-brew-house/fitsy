@@ -12,7 +12,9 @@ import {
   Center,
   Loader,
   Stack,
+  Paper,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconHistory } from '@tabler/icons-react';
 import { api } from '../../../lib/api';
 import type { ActivityLogResponse, ActivityTypeResponse } from '@fitsy/shared';
@@ -53,6 +55,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function HistoryPage() {
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [logs, setLogs] = useState<ActivityLogResponse[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -100,7 +103,7 @@ export default function HistoryPage() {
   return (
     <Container size="lg">
       <Stack gap="md">
-        <Group justify="space-between" align="flex-end">
+        <Group justify="space-between" align="flex-end" wrap="wrap">
           <Title order={2}>
             <Group gap="xs">
               <IconHistory size={28} />
@@ -116,7 +119,7 @@ export default function HistoryPage() {
               setPage(1);
             }}
             clearable
-            w={220}
+            w={{ base: '100%', sm: 220 }}
           />
         </Group>
 
@@ -135,30 +138,49 @@ export default function HistoryPage() {
           </Center>
         ) : (
           <>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Date</Table.Th>
-                  <Table.Th>Activity</Table.Th>
-                  <Table.Th>Measurement</Table.Th>
-                  <Table.Th ta="right">Points Earned</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
+            {isMobile ? (
+              <Stack gap="sm">
                 {logs.map((log) => (
-                  <Table.Tr key={log.id}>
-                    <Table.Td>{formatDate(log.createdAt)}</Table.Td>
-                    <Table.Td>
-                      {log.activityTypeIcon} {log.activityTypeName}
-                    </Table.Td>
-                    <Table.Td>{formatMeasurement(log)}</Table.Td>
-                    <Table.Td ta="right" fw={600} c="teal">
-                      +{log.pointsEarned}
-                    </Table.Td>
-                  </Table.Tr>
+                  <Paper key={log.id} p="md" radius="md" withBorder>
+                    <Group justify="space-between" align="flex-start">
+                      <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
+                        <Text fw={600}>
+                          {log.activityTypeIcon} {log.activityTypeName}
+                        </Text>
+                        <Text size="xs" c="dimmed">{formatDate(log.createdAt)}</Text>
+                        <Text size="sm">{formatMeasurement(log)}</Text>
+                      </Stack>
+                      <Text fw={700} c="teal">+{log.pointsEarned} pts</Text>
+                    </Group>
+                  </Paper>
                 ))}
-              </Table.Tbody>
-            </Table>
+              </Stack>
+            ) : (
+              <Table striped highlightOnHover>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Date</Table.Th>
+                    <Table.Th>Activity</Table.Th>
+                    <Table.Th>Measurement</Table.Th>
+                    <Table.Th ta="right">Points Earned</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {logs.map((log) => (
+                    <Table.Tr key={log.id}>
+                      <Table.Td>{formatDate(log.createdAt)}</Table.Td>
+                      <Table.Td>
+                        {log.activityTypeIcon} {log.activityTypeName}
+                      </Table.Td>
+                      <Table.Td>{formatMeasurement(log)}</Table.Td>
+                      <Table.Td ta="right" fw={600} c="teal">
+                        +{log.pointsEarned}
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            )}
 
             {totalPages > 1 && (
               <Center>

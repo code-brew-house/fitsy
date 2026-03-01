@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   Container,
   Title,
@@ -47,6 +48,7 @@ function rankDisplay(rank: number): string {
 }
 
 export default function LeaderboardPage() {
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [period, setPeriod] = useState('week');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [feed, setFeed] = useState<ActivityLogResponse[]>([]);
@@ -111,6 +113,42 @@ export default function LeaderboardPage() {
               </Text>
             </Stack>
           </Center>
+        ) : isMobile ? (
+          <Stack gap="sm">
+            {entries.map((entry, index) => {
+              const rank = index + 1;
+              const decoration = rankDecoration(rank);
+              return (
+                <Paper
+                  key={entry.userId}
+                  p="md"
+                  radius="md"
+                  withBorder
+                  style={
+                    decoration
+                      ? { borderLeftColor: decoration.borderColor, borderLeftWidth: 4, borderLeftStyle: 'solid' }
+                      : undefined
+                  }
+                >
+                  <Group justify="space-between" align="center">
+                    <Group gap="sm">
+                      <Text fw={700} w={32} c={decoration ? undefined : 'dimmed'}>
+                        {rankDisplay(rank)}
+                      </Text>
+                      <Avatar src={entry.avatarUrl} color="teal" radius="xl" size="sm">
+                        {entry.userName?.charAt(0)?.toUpperCase() || '?'}
+                      </Avatar>
+                      <Text fw={500}>{entry.userName}</Text>
+                    </Group>
+                    <Stack align="flex-end" gap={0}>
+                      <Text fw={600} c="teal">{entry.totalPoints} pts</Text>
+                      <Text size="xs" c="dimmed">{entry.activityCount} activities</Text>
+                    </Stack>
+                  </Group>
+                </Paper>
+              );
+            })}
+          </Stack>
         ) : (
           <Table striped highlightOnHover>
             <Table.Thead>
