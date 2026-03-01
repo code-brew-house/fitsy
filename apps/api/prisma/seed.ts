@@ -1,18 +1,20 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Clean existing data
+  // Clean existing data (BetterAuth tables + app tables)
   await prisma.redemption.deleteMany();
+  await prisma.reaction.deleteMany();
+  await prisma.comment.deleteMany();
   await prisma.activityLog.deleteMany();
   await prisma.reward.deleteMany();
   await prisma.activityType.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.verification.deleteMany();
   await prisma.user.deleteMany();
   await prisma.family.deleteMany();
-
-  const passwordHash = await bcrypt.hash('password123', 10);
 
   // Create family
   const family = await prisma.family.create({
@@ -22,11 +24,15 @@ async function main() {
     },
   });
 
-  // Create users
+  // Create users (BetterAuth schema: no passwordHash on user, id is a string set externally)
+  const adminId = 'seed-admin-001';
+  const memberId = 'seed-member-001';
+
   const admin = await prisma.user.create({
     data: {
+      id: adminId,
       email: 'admin@fitsy.dev',
-      passwordHash,
+      emailVerified: true,
       name: 'Admin Smith',
       role: 'ADMIN',
       familyId: family.id,
@@ -36,8 +42,9 @@ async function main() {
 
   const member = await prisma.user.create({
     data: {
+      id: memberId,
       email: 'member@fitsy.dev',
-      passwordHash,
+      emailVerified: true,
       name: 'Member Smith',
       role: 'MEMBER',
       familyId: family.id,
@@ -64,6 +71,10 @@ async function main() {
   const parkWalk = await prisma.activityType.create({
     data: { familyId: family.id, name: 'Outdoor Park Walk', icon: '🌳', measurementType: 'FLAT', flatPoints: 5 },
   });
+
+  // Suppress unused variable warnings
+  void incline;
+  void homeTread;
 
   // Sample activity logs
   let adminPoints = 0;
@@ -99,6 +110,7 @@ async function main() {
   console.log('Seed complete!');
   console.log(`Admin (${admin.email}): ${adminPoints} points`);
   console.log(`Member (${member.email}): ${memberPoints} points`);
+  console.log('Note: Use BetterAuth API to register real user accounts with passwords.');
 }
 
 main()

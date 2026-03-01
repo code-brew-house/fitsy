@@ -32,6 +32,83 @@ enum RedemptionStatus {
   CANCELLED
 }
 
+// === BetterAuth tables ===
+
+model User {
+  id            String    @id
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  name          String
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // App-specific fields
+  role          Role      @default(MEMBER)
+  familyId      String?
+  family        Family?   @relation(fields: [familyId], references: [id])
+  totalPoints   Int       @default(0)
+
+  // BetterAuth relations
+  sessions      Session[]
+  accounts      Account[]
+
+  // App relations
+  activityLogs  ActivityLog[]
+  redemptions   Redemption[]
+  comments      Comment[]
+  reactions     Reaction[]
+
+  @@index([familyId])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
+}
+
+// === App tables ===
+
 model Family {
   id            String         @id @default(uuid())
   name          String
@@ -40,23 +117,6 @@ model Family {
   users         User[]
   activityTypes ActivityType[]
   rewards       Reward[]
-}
-
-model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  passwordHash String
-  name         String
-  avatarUrl    String?
-  role         Role          @default(MEMBER)
-  familyId     String?
-  family       Family?       @relation(fields: [familyId], references: [id])
-  totalPoints  Int           @default(0)
-  createdAt    DateTime      @default(now())
-  activityLogs ActivityLog[]
-  redemptions  Redemption[]
-  comments     Comment[]
-  reactions    Reaction[]
 }
 
 model ActivityType {
@@ -77,6 +137,8 @@ model ActivityType {
   isActive        Boolean         @default(true)
   createdAt       DateTime        @default(now())
   activityLogs    ActivityLog[]
+
+  @@index([familyId])
 }
 
 model ActivityLog {
@@ -94,6 +156,9 @@ model ActivityLog {
   createdAt       DateTime        @default(now())
   comments        Comment[]
   reactions       Reaction[]
+
+  @@index([userId, createdAt])
+  @@index([activityTypeId])
 }
 
 model Comment {
@@ -105,6 +170,8 @@ model Comment {
   text          String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  @@index([activityLogId])
 }
 
 model Reaction {
@@ -117,6 +184,7 @@ model Reaction {
   createdAt     DateTime    @default(now())
 
   @@unique([activityLogId, userId, emoji])
+  @@index([activityLogId])
 }
 
 model Reward {
@@ -131,6 +199,8 @@ model Reward {
   isActive    Boolean      @default(true)
   createdAt   DateTime     @default(now())
   redemptions Redemption[]
+
+  @@index([familyId])
 }
 
 model Redemption {
@@ -142,4 +212,6 @@ model Redemption {
   pointsSpent Int
   status      RedemptionStatus @default(PENDING)
   createdAt   DateTime         @default(now())
+
+  @@index([userId, status])
 }
