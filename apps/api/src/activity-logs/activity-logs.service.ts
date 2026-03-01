@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ReactionsService } from '../reactions/reactions.service';
 import { CreateActivityLogDto, UpdateActivityLogDto } from '@fitsy/shared';
 
 @Injectable()
 export class ActivityLogsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private reactionsService: ReactionsService,
+  ) {}
 
   async create(userId: string, dto: CreateActivityLogDto) {
     const activityType = await this.prisma.activityType.findUnique({
@@ -78,6 +82,7 @@ export class ActivityLogsService {
         include: {
           activityType: { select: { name: true, icon: true } },
           user: { select: { name: true } },
+          _count: { select: { comments: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
@@ -85,6 +90,9 @@ export class ActivityLogsService {
       }),
       this.prisma.activityLog.count({ where }),
     ]);
+
+    const logIds = data.map((l) => l.id);
+    const reactionSummaries = await this.reactionsService.getReactionSummariesForLogs(logIds, userId);
 
     return {
       data: data.map((log) => ({
@@ -99,6 +107,9 @@ export class ActivityLogsService {
         effortLevel: log.effortLevel,
         durationMinutes: log.durationMinutes,
         pointsEarned: log.pointsEarned,
+        note: log.note ?? null,
+        commentCount: log._count.comments,
+        reactions: reactionSummaries[log.id] || [],
         createdAt: log.createdAt.toISOString(),
       })),
       total,
@@ -107,7 +118,7 @@ export class ActivityLogsService {
     };
   }
 
-  async findFeed(familyId: string, limit: number = 20) {
+  async findFeed(familyId: string, userId: string, limit: number = 20) {
     const users = await this.prisma.user.findMany({
       where: { familyId },
       select: { id: true },
@@ -119,10 +130,14 @@ export class ActivityLogsService {
       include: {
         activityType: { select: { name: true, icon: true } },
         user: { select: { name: true } },
+        _count: { select: { comments: true } },
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
     });
+
+    const logIds = logs.map((l) => l.id);
+    const reactionSummaries = await this.reactionsService.getReactionSummariesForLogs(logIds, userId);
 
     return logs.map((log) => ({
       id: log.id,
@@ -136,6 +151,9 @@ export class ActivityLogsService {
       effortLevel: log.effortLevel,
       durationMinutes: log.durationMinutes,
       pointsEarned: log.pointsEarned,
+      note: log.note ?? null,
+      commentCount: log._count.comments,
+      reactions: reactionSummaries[log.id] || [],
       createdAt: log.createdAt.toISOString(),
     }));
   }

@@ -54,7 +54,7 @@ export class ActivityLogsController {
     @Query('limit') limit?: string,
   ) {
     const familyId = await this.familyService.getUserFamilyId(req.user.userId);
-    return this.activityLogsService.findFeed(familyId, parseInt(limit ?? '20', 10));
+    return this.activityLogsService.findFeed(familyId, req.user.userId, parseInt(limit ?? '20', 10));
   }
 
   @Patch(':id')

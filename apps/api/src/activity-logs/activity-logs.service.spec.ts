@@ -2,11 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { ActivityLogsService } from './activity-logs.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { ReactionsService } from '../reactions/reactions.service';
 import { EffortLevel } from '@fitsy/shared';
 
 describe('ActivityLogsService', () => {
   let service: ActivityLogsService;
   let prisma: any;
+  let reactionsService: any;
 
   beforeEach(async () => {
     prisma = {
@@ -26,10 +28,15 @@ describe('ActivityLogsService', () => {
       $transaction: jest.fn((args: any[]) => Promise.all(args)),
     };
 
+    reactionsService = {
+      getReactionSummariesForLogs: jest.fn().mockResolvedValue({}),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ActivityLogsService,
         { provide: PrismaService, useValue: prisma },
+        { provide: ReactionsService, useValue: reactionsService },
       ],
     }).compile();
 
@@ -58,7 +65,10 @@ describe('ActivityLogsService', () => {
         measurementType: 'DISTANCE',
         distanceKm: 5,
         pointsEarned: 5,
+        note: null,
+        createdAt: new Date(),
         activityType: { name: 'Running', icon: '\u{1F3C3}' },
+        user: { name: 'Alice' },
       };
       prisma.activityLog.create.mockResolvedValue(logResult);
       prisma.user.update.mockResolvedValue({ id: 'user-1', totalPoints: 5 });
@@ -96,7 +106,10 @@ describe('ActivityLogsService', () => {
       const logResult = {
         id: 'log-2',
         pointsEarned: 8,
+        note: null,
+        createdAt: new Date(),
         activityType: { name: 'Gym Workout', icon: '\u{1F3CB}\u{FE0F}' },
+        user: { name: 'Alice' },
       };
       prisma.activityLog.create.mockResolvedValue(logResult);
       prisma.user.update.mockResolvedValue({});
@@ -127,7 +140,10 @@ describe('ActivityLogsService', () => {
       const logResult = {
         id: 'log-3',
         pointsEarned: 5,
+        note: null,
+        createdAt: new Date(),
         activityType: { name: 'Outdoor Park Walk', icon: '\u{1F333}' },
+        user: { name: 'Alice' },
       };
       prisma.activityLog.create.mockResolvedValue(logResult);
       prisma.user.update.mockResolvedValue({});
@@ -157,7 +173,10 @@ describe('ActivityLogsService', () => {
       const logResult = {
         id: 'log-4',
         pointsEarned: 2,
+        note: null,
+        createdAt: new Date(),
         activityType: { name: 'Yoga', icon: '\u{1F9D8}' },
+        user: { name: 'Alice' },
       };
       prisma.activityLog.create.mockResolvedValue(logResult);
       prisma.user.update.mockResolvedValue({});
@@ -184,7 +203,7 @@ describe('ActivityLogsService', () => {
         isActive: true,
         familyId: 'family-1',
       });
-      prisma.activityLog.create.mockResolvedValue({ id: 'log-5', pointsEarned: 10 });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-5', pointsEarned: 10, note: null, createdAt: new Date(), activityType: { name: 'Running', icon: '\u{1F3C3}' }, user: { name: 'Alice' } });
       prisma.user.update.mockResolvedValue({ id: 'user-1', totalPoints: 110 });
 
       await service.create('user-1', {
@@ -235,9 +254,11 @@ describe('ActivityLogsService', () => {
           effortLevel: null,
           durationMinutes: null,
           pointsEarned: 5,
+          note: null,
           createdAt: now,
           activityType: { name: 'Running', icon: '\u{1F3C3}' },
           user: { name: 'Alice' },
+          _count: { comments: 2 },
         },
       ];
       prisma.activityLog.findMany.mockResolvedValue(mockLogs);
@@ -259,6 +280,9 @@ describe('ActivityLogsService', () => {
             effortLevel: null,
             durationMinutes: null,
             pointsEarned: 5,
+            note: null,
+            commentCount: 2,
+            reactions: [],
             createdAt: now.toISOString(),
           },
         ],
@@ -271,6 +295,7 @@ describe('ActivityLogsService', () => {
         include: {
           activityType: { select: { name: true, icon: true } },
           user: { select: { name: true } },
+          _count: { select: { comments: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip: 0,
@@ -293,14 +318,19 @@ describe('ActivityLogsService', () => {
           effortLevel: null,
           durationMinutes: null,
           pointsEarned: 5,
+          note: 'Great run!',
           createdAt: now,
           user: { name: 'Alice' },
           activityType: { name: 'Running', icon: '\u{1F3C3}' },
+          _count: { comments: 3 },
         },
       ];
       prisma.activityLog.findMany.mockResolvedValue(mockLogs);
+      reactionsService.getReactionSummariesForLogs.mockResolvedValue({
+        'log-1': [{ emoji: '\u{1F44D}', count: 2, userReacted: true }],
+      });
 
-      const result = await service.findFeed('family-1', 20);
+      const result = await service.findFeed('family-1', 'user-1', 20);
 
       expect(result).toEqual([
         {
@@ -315,6 +345,9 @@ describe('ActivityLogsService', () => {
           effortLevel: null,
           durationMinutes: null,
           pointsEarned: 5,
+          note: 'Great run!',
+          commentCount: 3,
+          reactions: [{ emoji: '\u{1F44D}', count: 2, userReacted: true }],
           createdAt: now.toISOString(),
         },
       ]);
@@ -327,10 +360,12 @@ describe('ActivityLogsService', () => {
         include: {
           activityType: { select: { name: true, icon: true } },
           user: { select: { name: true } },
+          _count: { select: { comments: true } },
         },
         orderBy: { createdAt: 'desc' },
         take: 20,
       });
+      expect(reactionsService.getReactionSummariesForLogs).toHaveBeenCalledWith(['log-1'], 'user-1');
     });
   });
 });
