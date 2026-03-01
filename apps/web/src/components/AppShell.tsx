@@ -101,14 +101,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               onClick={() => navigate('/dashboard')}
             >
               <FitsyLogo size={32} />
-              <Text size="xl" fw={800} c="teal" style={{ letterSpacing: '-0.01em' }}>
+              <Text size="xl" fw={800} c="teal" style={{ letterSpacing: '-0.01em' }} visibleFrom="sm">
                 Fitsy
               </Text>
             </Group>
           </Group>
           <Group gap="sm">
             <PwaInstallButton />
-            <PointsBadge />
+            <Box visibleFrom="sm">
+              <PointsBadge />
+            </Box>
             <ThemeToggle />
             <Menu shadow="md" width={200}>
               <Menu.Target>
