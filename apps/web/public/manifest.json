@@ -4,8 +4,8 @@
   "description": "Earn fitness points and redeem rewards with your family",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#12b886",
+  "background_color": "#F8F9FC",
+  "theme_color": "#6C5CE7",
   "icons": [
     { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
