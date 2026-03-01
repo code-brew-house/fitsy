@@ -3,8 +3,6 @@ import * as schemas from './schemas';
 import { Role, MeasurementType, EffortLevel, RedemptionStatus } from './enums';
 
 // Request types (inferred from Zod schemas)
-export type RegisterDto = z.infer<typeof schemas.registerSchema>;
-export type LoginDto = z.infer<typeof schemas.loginSchema>;
 export type CreateFamilyDto = z.infer<typeof schemas.createFamilySchema>;
 export type JoinFamilyDto = z.infer<typeof schemas.joinFamilySchema>;
 export type UpdateFamilyDto = z.infer<typeof schemas.updateFamilySchema>;
@@ -116,11 +114,6 @@ export interface DashboardResponse {
   activitiesThisWeek: number;
   currentStreak: number;
   recentActivities: ActivityLogResponse[];
-}
-
-export interface AuthResponse {
-  accessToken: string;
-  user: UserResponse;
 }
 
 export interface CommentResponse {

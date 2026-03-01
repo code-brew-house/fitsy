@@ -1,19 +1,6 @@
 import { z } from 'zod';
 import { MeasurementType, EffortLevel } from './enums';
 
-// Auth
-export const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  name: z.string().min(1).max(100),
-  inviteCode: z.string().optional(),
-});
-
-export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-});
-
 // Family
 export const createFamilySchema = z.object({
   name: z.string().min(1).max(100),
