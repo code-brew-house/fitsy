@@ -210,7 +210,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
-        <Group grow gap={0} h={60} style={{ position: 'relative' }}>
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            width: '100%',
+            height: 60,
+          }}
+        >
           {activeTabIndex >= 0 && (
             <motion.div
               layoutId="bottomNavIndicator"
@@ -221,10 +228,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 left: `${(activeTabIndex * 100) / mainNav.length}%`,
                 display: 'flex',
                 justifyContent: 'center',
+                pointerEvents: 'none',
               }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}
             >
-              <Box
+              <div
                 style={{
                   width: 24,
                   height: 3,
@@ -241,11 +249,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 onClick={() => navigate(item.href)}
                 style={{
+                  flex: 1,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   height: '100%',
-                  width: '100%',
+                  minWidth: 0,
                 }}
               >
                 <motion.div whileTap={{ scale: 0.85 }}>
@@ -271,7 +280,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </UnstyledButton>
             );
           })}
-        </Group>
+        </div>
       </MantineAppShell.Footer>
     </MantineAppShell>
   );

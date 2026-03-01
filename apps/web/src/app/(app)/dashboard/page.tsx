@@ -12,8 +12,6 @@ import {
   Button,
   Group,
   Box,
-  Affix,
-  ActionIcon,
 } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { IconPlus, IconUsers, IconUserPlus, IconFlame } from '@tabler/icons-react';
@@ -194,23 +192,6 @@ export default function DashboardPage() {
         </div>
       </Stack>
 
-      <Affix position={{ bottom: 90, right: 20 }}>
-        <motion.div whileTap={{ scale: 0.9 }}>
-          <ActionIcon
-            color="indigo"
-            size={56}
-            radius="xl"
-            variant="filled"
-            onClick={() => router.push('/log')}
-            aria-label="Log activity"
-            style={{
-              boxShadow: '0 4px 16px rgba(108, 92, 231, 0.4)',
-            }}
-          >
-            <IconPlus size={28} />
-          </ActionIcon>
-        </motion.div>
-      </Affix>
     </Container>
   );
 }
