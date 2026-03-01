@@ -5,3 +5,8 @@ dist/
 .env
 .env.local
 *.log
+
+# Screenshots and build artifacts
+.playwright-mcp/
+*.png
+apps/web/tsconfig.tsbuildinfo
