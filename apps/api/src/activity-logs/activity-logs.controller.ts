@@ -10,6 +10,7 @@ import {
   UseGuards,
   Request,
   HttpCode,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ActivityLogsService } from './activity-logs.service';
 import { FamilyService } from '../family/family.service';
@@ -39,9 +40,17 @@ export class ActivityLogsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('activityTypeId') activityTypeId?: string,
+    @Query('userId') userId?: string,
   ) {
+    if (userId) {
+      const requesterFamilyId = await this.familyService.getUserFamilyId(req.user.id);
+      const targetFamilyId = await this.familyService.getUserFamilyId(userId);
+      if (requesterFamilyId !== targetFamilyId) {
+        throw new ForbiddenException('You can only view activities of family members');
+      }
+    }
     return this.activityLogsService.findOwn(
-      req.user.id,
+      userId || req.user.id,
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 20,
       activityTypeId,

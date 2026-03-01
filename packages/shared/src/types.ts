@@ -116,6 +116,18 @@ export interface DashboardResponse {
   recentActivities: ActivityLogResponse[];
 }
 
+export interface ProfileResponse {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+  role: Role;
+  totalPoints: number;
+  activityCount: number;
+  currentStreak: number;
+  avgPointsPerActivity: number;
+  memberSince: string; // ISO string of user.createdAt, named for display clarity
+}
+
 export interface CommentResponse {
   id: string;
   userId: string;
