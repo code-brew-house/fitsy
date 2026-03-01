@@ -23,7 +23,7 @@ export function PwaInstallButton() {
     const ua = navigator.userAgent;
     setIsIos(
       (/iphone|ipad|ipod/i.test(ua) && !('MSStream' in window)) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      (ua.includes('Macintosh') && navigator.maxTouchPoints > 1)
     );
 
     const handler = (e: Event) => {
