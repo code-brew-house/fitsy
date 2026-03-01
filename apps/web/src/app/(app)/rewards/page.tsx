@@ -20,15 +20,21 @@ import { IconGift } from '@tabler/icons-react';
 import { api } from '../../../lib/api';
 import { useAuth } from '../../../lib/auth-context';
 import { RewardCard } from '../../../components/RewardCard';
+import { Confetti } from '../../../components/Confetti';
+import { useHaptics } from '../../../hooks/useHaptics';
+import { useSoundEffect } from '../../../hooks/useSoundEffect';
 import type { RewardResponse } from '@fitsy/shared';
 
 export default function RewardsPage() {
   const { user } = useAuth();
+  const { vibrate } = useHaptics();
+  const { play } = useSoundEffect();
   const [rewards, setRewards] = useState<RewardResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReward, setSelectedReward] = useState<RewardResponse | null>(null);
   const [redeeming, setRedeeming] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const fetchRewards = useCallback(async () => {
     try {
@@ -58,8 +64,12 @@ export default function RewardsPage() {
       notifications.show({
         title: 'Reward Redeemed!',
         message: `You redeemed "${selectedReward.name}" for ${selectedReward.pointCost} points.`,
-        color: 'teal',
+        color: 'indigo',
       });
+      setShowConfetti(true);
+      vibrate('achievement');
+      play('celebration');
+      setTimeout(() => setShowConfetti(false), 2500);
       close();
       await fetchRewards();
     } catch (err) {
@@ -75,6 +85,7 @@ export default function RewardsPage() {
 
   return (
     <Container size="lg">
+      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
       <Stack gap="md">
         <Title order={2}>
           <Group gap="xs">
@@ -85,7 +96,7 @@ export default function RewardsPage() {
 
         {loading ? (
           <Center py="xl">
-            <Loader color="teal" />
+            <Loader color="indigo" />
           </Center>
         ) : rewards.length === 0 ? (
           <Center py="xl">
@@ -121,7 +132,7 @@ export default function RewardsPage() {
           <Stack gap="md">
             <Text>
               Spend{' '}
-              <Badge color="teal" variant="light" component="span">
+              <Badge color="indigo" variant="light" component="span">
                 {selectedReward.pointCost} points
               </Badge>{' '}
               on <strong>{selectedReward.name}</strong>?
@@ -135,7 +146,7 @@ export default function RewardsPage() {
                 Cancel
               </Button>
               <Button
-                color="teal"
+                color="indigo"
                 onClick={handleConfirmRedeem}
                 loading={redeeming}
               >

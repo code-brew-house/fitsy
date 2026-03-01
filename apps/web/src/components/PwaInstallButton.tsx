@@ -35,7 +35,7 @@ export function PwaInstallButton() {
     <Tooltip label="Install app" position="bottom">
       <Button
         variant="light"
-        color="teal"
+        color="indigo"
         size="xs"
         leftSection={<IconDownload size={14} />}
         onClick={handleInstall}

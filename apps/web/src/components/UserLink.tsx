@@ -19,7 +19,7 @@ export function UserLink({ userId, name, avatarUrl, showAvatar = false, size = '
     return (
       <Link href={`/profile/${userId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <Group gap="sm" wrap="nowrap" style={{ cursor: 'pointer' }}>
-          <Avatar src={avatarUrl} color="teal" radius="xl" size={size}>
+          <Avatar src={avatarUrl} color="indigo" radius="xl" size={size}>
             {initial}
           </Avatar>
           <Text size={size} fw={fw}>{name}</Text>

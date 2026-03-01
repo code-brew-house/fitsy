@@ -16,8 +16,8 @@ export function FitsyLogo({ size = 32 }: { size?: number }) {
           y2="40"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0%" stopColor="#2dd4bf" />
-          <stop offset="100%" stopColor="#0d9488" />
+          <stop offset="0%" stopColor="#9180ff" />
+          <stop offset="100%" stopColor="#6C5CE7" />
         </linearGradient>
       </defs>
       {/* Hexagonal badge */}

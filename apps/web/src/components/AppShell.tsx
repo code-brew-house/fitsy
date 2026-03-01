@@ -14,7 +14,8 @@ import {
   Box,
   Stack,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { motion } from 'framer-motion';
 import {
   IconDashboard,
   IconPlus,
@@ -30,12 +31,12 @@ import {
 } from '@tabler/icons-react';
 import { Role } from '@fitsy/shared';
 import { useAuth } from '../lib/auth-context';
-import { useMediaQuery } from '@mantine/hooks';
 import { ThemeToggle } from './ThemeToggle';
 import { PointsBadge } from './PointsBadge';
 import { FitsyLogo } from './FitsyLogo';
 import { PwaInstallButton } from './PwaInstallButton';
 import { PageTransition } from './PageTransition';
+import { useHaptics } from '../hooks/useHaptics';
 
 const mainNav = [
   { label: 'Dashboard', icon: IconDashboard, href: '/dashboard' },
@@ -63,14 +64,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [opened, { toggle, close }] = useDisclosure(false);
+  const { vibrate } = useHaptics();
 
   const isAdmin = user?.role === Role.ADMIN;
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const navigate = (href: string) => {
+    vibrate('tap');
     router.push(href);
     close();
   };
+
+  const activeTabIndex = mainNav.findIndex((item) => pathname === item.href);
 
   return (
     <MantineAppShell
@@ -82,7 +87,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       }}
       padding="md"
     >
-      {/* Header */}
       <MantineAppShell.Header>
         <Group h="100%" px="md" justify="space-between">
           <Group>
@@ -101,7 +105,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               onClick={() => navigate('/dashboard')}
             >
               <FitsyLogo size={32} />
-              <Text size="xl" fw={800} c="teal" style={{ letterSpacing: '-0.01em' }} visibleFrom="sm">
+              <Text size="xl" fw={800} c="indigo" style={{ letterSpacing: '-0.01em' }} visibleFrom="sm">
                 Fitsy
               </Text>
             </Group>
@@ -115,7 +119,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Menu shadow="md" width={200}>
               <Menu.Target>
                 <UnstyledButton>
-                  <Avatar color="teal" radius="xl" size="md">
+                  <Avatar color="indigo" radius="xl" size="md">
                     {user?.name?.charAt(0)?.toUpperCase() || '?'}
                   </Avatar>
                 </UnstyledButton>
@@ -142,7 +146,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Group>
       </MantineAppShell.Header>
 
-      {/* Desktop sidebar */}
       <MantineAppShell.Navbar p="sm">
         <Stack gap={4}>
           {mainNav.map((item) => (
@@ -152,6 +155,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               leftSection={<item.icon size={20} />}
               active={pathname === item.href}
               onClick={() => navigate(item.href)}
+              color="indigo"
+              variant={pathname === item.href ? 'light' : 'subtle'}
             />
           ))}
           <Divider my="xs" />
@@ -162,6 +167,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               leftSection={<item.icon size={20} />}
               active={pathname === item.href}
               onClick={() => navigate(item.href)}
+              color="indigo"
+              variant={pathname === item.href ? 'light' : 'subtle'}
             />
           ))}
           {isAdmin && (
@@ -174,6 +181,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   leftSection={<item.icon size={20} />}
                   active={pathname === item.href}
                   onClick={() => navigate(item.href)}
+                  color="indigo"
+                  variant={pathname === item.href ? 'light' : 'subtle'}
                 />
               ))}
             </>
@@ -189,13 +198,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Box>
       </MantineAppShell.Navbar>
 
-      {/* Main content */}
       <MantineAppShell.Main>
         <Box pb={isMobile ? 80 : 0}>
           <PageTransition>{children}</PageTransition>
         </Box>
 
-        {/* Mobile bottom navigation */}
         <Box
           hiddenFrom="sm"
           style={{
@@ -206,35 +213,65 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             zIndex: 100,
             borderTop: '1px solid var(--mantine-color-default-border)',
             backgroundColor: 'var(--mantine-color-body)',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           }}
         >
-          <Group grow gap={0} h={60}>
-            {mainNav.map((item) => (
-              <UnstyledButton
-                key={item.href}
-                onClick={() => navigate(item.href)}
-                style={{ textAlign: 'center' }}
-                py="xs"
+          <Group grow gap={0} h={60} style={{ position: 'relative' }}>
+            {activeTabIndex >= 0 && (
+              <motion.div
+                layoutId="bottomNavIndicator"
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  width: `${100 / mainNav.length}%`,
+                  left: `${(activeTabIndex * 100) / mainNav.length}%`,
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
               >
-                <Stack align="center" gap={2}>
-                  <item.icon
-                    size={22}
-                    color={
-                      pathname === item.href
-                        ? 'var(--mantine-color-teal-6)'
-                        : 'var(--mantine-color-dimmed)'
-                    }
-                  />
-                  <Text
-                    size="xs"
-                    c={pathname === item.href ? 'teal' : 'dimmed'}
-                    fw={pathname === item.href ? 600 : 400}
-                  >
-                    {item.label}
-                  </Text>
-                </Stack>
-              </UnstyledButton>
-            ))}
+                <Box
+                  style={{
+                    width: 24,
+                    height: 3,
+                    borderRadius: 2,
+                    backgroundColor: 'var(--mantine-color-indigo-6)',
+                  }}
+                />
+              </motion.div>
+            )}
+            {mainNav.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <UnstyledButton
+                  key={item.href}
+                  onClick={() => navigate(item.href)}
+                  style={{ textAlign: 'center' }}
+                  py="xs"
+                >
+                  <motion.div whileTap={{ scale: 0.85 }}>
+                    <Stack align="center" gap={2}>
+                      <item.icon
+                        size={22}
+                        color={
+                          isActive
+                            ? 'var(--mantine-color-indigo-6)'
+                            : 'var(--mantine-color-dimmed)'
+                        }
+                        strokeWidth={isActive ? 2.5 : 1.5}
+                      />
+                      <Text
+                        size="xs"
+                        c={isActive ? 'indigo' : 'dimmed'}
+                        fw={isActive ? 700 : 400}
+                      >
+                        {item.label}
+                      </Text>
+                    </Stack>
+                  </motion.div>
+                </UnstyledButton>
+              );
+            })}
           </Group>
         </Box>
       </MantineAppShell.Main>

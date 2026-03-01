@@ -20,13 +20,13 @@ export function ProfileHeader({ profile, isOwnProfile, onSettingsClick }: Profil
   return (
     <Group justify="space-between" align="flex-start">
       <Group gap="md">
-        <Avatar src={profile.avatarUrl} color="teal" radius="xl" size={80}>
+        <Avatar src={profile.avatarUrl} color="indigo" radius="xl" size={80}>
           <Text size="xl" fw={700}>{initial}</Text>
         </Avatar>
         <Stack gap={4}>
           <Group gap="sm">
             <Text size="xl" fw={700}>{profile.name}</Text>
-            <Badge color={profile.role === 'ADMIN' ? 'teal' : 'gray'} variant="light" size="sm">
+            <Badge color={profile.role === 'ADMIN' ? 'indigo' : 'gray'} variant="light" size="sm">
               {profile.role}
             </Badge>
           </Group>

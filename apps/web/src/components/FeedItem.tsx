@@ -26,6 +26,7 @@ import type {
   ReactionSummary,
 } from '@fitsy/shared';
 import { ALLOWED_EMOJIS } from '@fitsy/shared';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth-context';
@@ -185,7 +186,7 @@ export function FeedItem({ activity }: FeedItemProps) {
       {/* Main activity line */}
       <Group gap="sm" wrap="nowrap">
         <Link href={`/profile/${activity.userId}`} style={{ textDecoration: 'none' }}>
-          <Avatar color="teal" radius="xl" size="md" style={{ cursor: 'pointer' }}>
+          <Avatar color="indigo" radius="xl" size="md" style={{ cursor: 'pointer' }}>
             {initial}
           </Avatar>
         </Link>
@@ -198,7 +199,7 @@ export function FeedItem({ activity }: FeedItemProps) {
             </Text>
           </Text>
           <Group gap="xs">
-            <Text size="xs" c="teal" fw={600}>
+            <Text size="xs" c="energy.6" fw={600}>
               +{activity.pointsEarned} pts
             </Text>
             <Text size="xs" c="dimmed">
@@ -223,19 +224,20 @@ export function FeedItem({ activity }: FeedItemProps) {
           const reacted = reaction?.userReacted || false;
 
           return (
-            <ActionIcon
-              key={emoji}
-              variant={reacted ? 'filled' : 'subtle'}
-              color={reacted ? 'teal' : 'gray'}
-              radius="xl"
-              size="sm"
-              onClick={() => handleReaction(emoji)}
-            >
-              <Text size="xs">
-                {emoji}
-                {count > 0 ? ` ${count}` : ''}
-              </Text>
-            </ActionIcon>
+            <motion.div key={emoji} whileTap={{ scale: 1.3 }} style={{ display: 'inline-flex' }}>
+              <ActionIcon
+                variant={reacted ? 'filled' : 'subtle'}
+                color={reacted ? 'indigo' : 'gray'}
+                radius="xl"
+                size="sm"
+                onClick={() => handleReaction(emoji)}
+              >
+                <Text size="xs">
+                  {emoji}
+                  {count > 0 ? ` ${count}` : ''}
+                </Text>
+              </ActionIcon>
+            </motion.div>
           );
         })}
 

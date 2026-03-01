@@ -5,50 +5,34 @@ import { useMediaQuery } from '@mantine/hooks';
 import {
   Container,
   Title,
-  Table,
-  SegmentedControl,
-  Group,
   Text,
   Center,
   Loader,
   Stack,
   Paper,
-  Divider,
+  Group,
+  Box,
+  UnstyledButton,
 } from '@mantine/core';
+import { motion } from 'framer-motion';
 import { IconTrophy } from '@tabler/icons-react';
 import { api } from '../../../lib/api';
 import type { LeaderboardEntry, ActivityLogResponse } from '@fitsy/shared';
+import { useAuth } from '../../../lib/auth-context';
 import { FeedItem } from '../../../components/FeedItem';
 import { UserLink } from '../../../components/UserLink';
+import { Podium } from '../../../components/Podium';
+import { AnimatedList, AnimatedListItem } from '../../../components/AnimatedList';
+import { AnimatedCounter } from '../../../components/AnimatedCounter';
 
-function rankDecoration(rank: number): { borderColor: string; label: string } | null {
-  switch (rank) {
-    case 1:
-      return { borderColor: '#FFD700', label: 'Gold' };
-    case 2:
-      return { borderColor: '#C0C0C0', label: 'Silver' };
-    case 3:
-      return { borderColor: '#CD7F32', label: 'Bronze' };
-    default:
-      return null;
-  }
-}
-
-function rankDisplay(rank: number): string {
-  switch (rank) {
-    case 1:
-      return '1st';
-    case 2:
-      return '2nd';
-    case 3:
-      return '3rd';
-    default:
-      return `${rank}th`;
-  }
-}
+const periods = [
+  { label: 'This Week', value: 'week' },
+  { label: 'This Month', value: 'month' },
+  { label: 'All Time', value: 'alltime' },
+];
 
 export default function LeaderboardPage() {
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const { user } = useAuth();
   const [period, setPeriod] = useState('week');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [feed, setFeed] = useState<ActivityLogResponse[]>([]);
@@ -79,30 +63,68 @@ export default function LeaderboardPage() {
       .finally(() => setLoadingFeed(false));
   }, []);
 
+  const activeIndex = periods.findIndex((p) => p.value === period);
+
   return (
     <Container size="lg">
       <Stack gap="lg">
         <Title order={2}>
           <Group gap="xs">
-            <IconTrophy size={28} />
+            <IconTrophy size={28} color="var(--mantine-color-sunshine-6)" />
             Leaderboard
           </Group>
         </Title>
 
-        <SegmentedControl
-          value={period}
-          onChange={setPeriod}
-          data={[
-            { label: 'This Week', value: 'week' },
-            { label: 'This Month', value: 'month' },
-            { label: 'All Time', value: 'alltime' },
-          ]}
-          color="teal"
-        />
+        <Box
+          style={{
+            display: 'flex',
+            position: 'relative',
+            backgroundColor: 'var(--mantine-color-default)',
+            borderRadius: 'var(--mantine-radius-xl)',
+            padding: 4,
+            border: '1px solid var(--mantine-color-default-border)',
+          }}
+        >
+          <motion.div
+            layoutId="periodIndicator"
+            style={{
+              position: 'absolute',
+              top: 4,
+              height: 'calc(100% - 8px)',
+              width: `calc(${100 / periods.length}% - 4px)`,
+              left: `calc(${(activeIndex * 100) / periods.length}% + 2px)`,
+              backgroundColor: 'var(--mantine-color-indigo-6)',
+              borderRadius: 'var(--mantine-radius-xl)',
+            }}
+            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+          />
+          {periods.map((p) => (
+            <UnstyledButton
+              key={p.value}
+              onClick={() => setPeriod(p.value)}
+              style={{
+                flex: 1,
+                textAlign: 'center',
+                padding: '8px 0',
+                position: 'relative',
+                zIndex: 1,
+                borderRadius: 'var(--mantine-radius-xl)',
+              }}
+            >
+              <Text
+                size="sm"
+                fw={period === p.value ? 700 : 500}
+                c={period === p.value ? 'white' : 'dimmed'}
+              >
+                {p.label}
+              </Text>
+            </UnstyledButton>
+          ))}
+        </Box>
 
         {loadingBoard ? (
           <Center py="xl">
-            <Loader color="teal" />
+            <Loader color="indigo" />
           </Center>
         ) : entries.length === 0 ? (
           <Center py="xl">
@@ -113,97 +135,83 @@ export default function LeaderboardPage() {
               </Text>
             </Stack>
           </Center>
-        ) : isMobile ? (
-          <Stack gap="sm">
-            {entries.map((entry, index) => {
-              const rank = index + 1;
-              const decoration = rankDecoration(rank);
-              return (
-                <Paper
-                  key={entry.userId}
-                  p="md"
-                  radius="md"
-                  withBorder
-                  style={
-                    decoration
-                      ? { borderLeftColor: decoration.borderColor, borderLeftWidth: 4, borderLeftStyle: 'solid' }
-                      : undefined
-                  }
-                >
-                  <Group justify="space-between" align="center">
-                    <Group gap="sm">
-                      <Text fw={700} w={32} c={decoration ? undefined : 'dimmed'}>
-                        {rankDisplay(rank)}
-                      </Text>
-                      <UserLink userId={entry.userId} name={entry.userName} avatarUrl={entry.avatarUrl} showAvatar fw={500} />
-                    </Group>
-                    <Stack align="flex-end" gap={0}>
-                      <Text fw={600} c="teal">{entry.totalPoints} pts</Text>
-                      <Text size="xs" c="dimmed">{entry.activityCount} activities</Text>
-                    </Stack>
-                  </Group>
-                </Paper>
-              );
-            })}
-          </Stack>
         ) : (
-          <Table striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th w={60}>Rank</Table.Th>
-                <Table.Th>Name</Table.Th>
-                <Table.Th ta="right">Points</Table.Th>
-                <Table.Th ta="right">Activities</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {entries.map((entry, index) => {
-                const rank = index + 1;
-                const decoration = rankDecoration(rank);
-                return (
-                  <Table.Tr
-                    key={entry.userId}
-                    style={
-                      decoration
-                        ? { borderLeft: `4px solid ${decoration.borderColor}` }
-                        : undefined
-                    }
-                  >
-                    <Table.Td fw={700} c={decoration ? undefined : 'dimmed'}>
-                      {rankDisplay(rank)}
-                    </Table.Td>
-                    <Table.Td>
-                      <UserLink userId={entry.userId} name={entry.userName} avatarUrl={entry.avatarUrl} showAvatar fw={500} />
-                    </Table.Td>
-                    <Table.Td ta="right" fw={600} c="teal">
-                      {entry.totalPoints}
-                    </Table.Td>
-                    <Table.Td ta="right">{entry.activityCount}</Table.Td>
-                  </Table.Tr>
-                );
-              })}
-            </Table.Tbody>
-          </Table>
+          <>
+            {entries.length >= 2 && (
+              <Podium
+                entries={entries.slice(0, 3).map((e) => ({
+                  userId: e.userId,
+                  userName: e.userName,
+                  avatarUrl: e.avatarUrl,
+                  totalPoints: e.totalPoints,
+                }))}
+              />
+            )}
+
+            {entries.length > 3 && (
+              <AnimatedList>
+                <Stack gap="xs">
+                  {entries.slice(3).map((entry, index) => {
+                    const rank = index + 4;
+                    const isCurrentUser = entry.userId === user?.id;
+                    return (
+                      <AnimatedListItem key={entry.userId}>
+                        <Paper
+                          p="md"
+                          radius="lg"
+                          shadow="xs"
+                          withBorder
+                          style={
+                            isCurrentUser
+                              ? { borderColor: 'var(--mantine-color-indigo-6)', backgroundColor: 'var(--mantine-color-indigo-0)' }
+                              : undefined
+                          }
+                        >
+                          <Group justify="space-between" align="center">
+                            <Group gap="sm">
+                              <Text fw={700} w={32} c="dimmed">
+                                {rank}th
+                              </Text>
+                              <UserLink userId={entry.userId} name={entry.userName} avatarUrl={entry.avatarUrl} showAvatar fw={500} />
+                              {isCurrentUser && (
+                                <Text size="xs" fw={700} c="indigo">You</Text>
+                              )}
+                            </Group>
+                            <Stack align="flex-end" gap={0}>
+                              <AnimatedCounter value={entry.totalPoints} fw={600} c="energy.6" size="sm" suffix=" pts" />
+                              <Text size="xs" c="dimmed">{entry.activityCount} activities</Text>
+                            </Stack>
+                          </Group>
+                        </Paper>
+                      </AnimatedListItem>
+                    );
+                  })}
+                </Stack>
+              </AnimatedList>
+            )}
+          </>
         )}
 
-        {/* Family Activity Feed */}
-        <Divider />
-        <Title order={3}>Family Activity Feed</Title>
+        <Title order={3} mt="md">Family Activity Feed</Title>
 
         {loadingFeed ? (
           <Center py="md">
-            <Loader color="teal" size="sm" />
+            <Loader color="indigo" size="sm" />
           </Center>
         ) : feed.length === 0 ? (
           <Text c="dimmed">No recent family activity.</Text>
         ) : (
-          <Stack gap="xs">
-            {feed.map((item) => (
-              <Paper key={item.id} p="sm" withBorder radius="sm">
-                <FeedItem activity={item} />
-              </Paper>
-            ))}
-          </Stack>
+          <AnimatedList>
+            <Stack gap="xs">
+              {feed.map((item) => (
+                <AnimatedListItem key={item.id}>
+                  <Paper p="sm" withBorder radius="lg" shadow="xs">
+                    <FeedItem activity={item} />
+                  </Paper>
+                </AnimatedListItem>
+              ))}
+            </Stack>
+          </AnimatedList>
         )}
       </Stack>
     </Container>

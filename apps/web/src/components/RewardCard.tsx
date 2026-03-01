@@ -40,7 +40,7 @@ export function RewardCard({ reward, userPoints, onRedeem }: RewardCardProps) {
           <Box
             h={160}
             style={{
-              background: 'linear-gradient(135deg, var(--mantine-color-teal-4), var(--mantine-color-cyan-4))',
+              background: 'var(--mantine-color-indigo-6)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -55,7 +55,7 @@ export function RewardCard({ reward, userPoints, onRedeem }: RewardCardProps) {
         <Text fw={500} lineClamp={1}>
           {reward.name}
         </Text>
-        <Badge color="teal" variant="light">
+        <Badge color="energy" variant="light">
           {reward.pointCost} pts
         </Badge>
       </Group>
@@ -66,7 +66,7 @@ export function RewardCard({ reward, userPoints, onRedeem }: RewardCardProps) {
 
       {canAfford ? (
         <Button
-          color="teal"
+          color="indigo"
           fullWidth
           radius="md"
           onClick={() => onRedeem(reward)}
@@ -76,7 +76,7 @@ export function RewardCard({ reward, userPoints, onRedeem }: RewardCardProps) {
       ) : (
         <Tooltip label="Not enough points">
           <Button
-            color="teal"
+            color="indigo"
             fullWidth
             radius="md"
             disabled

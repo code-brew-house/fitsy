@@ -111,7 +111,7 @@ export function ProfileView({ userId, isOwnProfile }: ProfileViewProps) {
   if (loadingProfile) {
     return (
       <Center py="xl">
-        <Loader color="teal" />
+        <Loader color="indigo" />
       </Center>
     );
   }
@@ -153,7 +153,7 @@ export function ProfileView({ userId, isOwnProfile }: ProfileViewProps) {
         {/* Activity feed */}
         {loadingActivities ? (
           <Center py="md">
-            <Loader color="teal" size="sm" />
+            <Loader color="indigo" size="sm" />
           </Center>
         ) : activities.length === 0 ? (
           <Center py="xl">
@@ -179,7 +179,7 @@ export function ProfileView({ userId, isOwnProfile }: ProfileViewProps) {
               total={totalPages}
               value={page}
               onChange={setPage}
-              color="teal"
+              color="indigo"
             />
           </Center>
         )}
@@ -198,16 +198,16 @@ export function ProfileView({ userId, isOwnProfile }: ProfileViewProps) {
                 { label: 'Dark', value: 'dark' },
                 { label: 'Auto', value: 'auto' },
               ]}
-              color="teal"
+              color="indigo"
             />
             <Group justify="flex-end">
               <Button
-                color="teal"
+                color="indigo"
                 onClick={() => {
                   notifications.show({
                     title: 'Preferences Saved',
                     message: 'Your color scheme preference has been updated.',
-                    color: 'teal',
+                    color: 'indigo',
                   });
                   closeSettings();
                 }}

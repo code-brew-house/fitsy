@@ -6,8 +6,10 @@ import {
   IconFlame,
   IconTrendingUp,
   IconActivity,
-  IconCalendarStats,
+  IconTrophy,
 } from '@tabler/icons-react';
+import { listItemVariants } from '../lib/motion';
+import { AnimatedCounter } from './AnimatedCounter';
 
 interface StatCardsProps {
   totalPoints: number;
@@ -17,10 +19,10 @@ interface StatCardsProps {
 }
 
 const stats = [
-  { key: 'totalPoints' as const, label: 'Total Points', icon: IconFlame, color: 'teal' },
-  { key: 'pointsThisWeek' as const, label: 'Points This Week', icon: IconTrendingUp, color: 'blue' },
-  { key: 'activitiesThisWeek' as const, label: 'Activities This Week', icon: IconActivity, color: 'green' },
-  { key: 'currentStreak' as const, label: 'Current Streak', icon: IconCalendarStats, color: 'orange' },
+  { key: 'pointsThisWeek' as const, label: 'Points This Week', icon: IconTrendingUp, color: 'energy', suffix: '' },
+  { key: 'currentStreak' as const, label: 'Current Streak', icon: IconFlame, color: 'coral', suffix: 'd' },
+  { key: 'activitiesThisWeek' as const, label: 'Activities', icon: IconActivity, color: 'mint', suffix: '' },
+  { key: 'totalPoints' as const, label: 'Total Points', icon: IconTrophy, color: 'indigo', suffix: '' },
 ];
 
 export function StatCards({ totalPoints, pointsThisWeek, activitiesThisWeek, currentStreak }: StatCardsProps) {
@@ -31,15 +33,12 @@ export function StatCards({ totalPoints, pointsThisWeek, activitiesThisWeek, cur
       {stats.map((stat, index) => (
         <motion.div
           key={stat.key}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.35,
-            delay: index * 0.08,
-            ease: [0.22, 1, 0.36, 1],
-          }}
+          variants={listItemVariants}
+          initial="initial"
+          animate="animate"
+          transition={{ delay: index * 0.08 }}
         >
-          <Paper p="md" radius="md" withBorder h="100%">
+          <Paper p="lg" radius="lg" shadow="xs" withBorder h="100%">
             <Group gap="xs" mb="xs">
               <ThemeIcon variant="light" color={stat.color} size="lg" radius="md">
                 <stat.icon size={20} />
@@ -48,9 +47,13 @@ export function StatCards({ totalPoints, pointsThisWeek, activitiesThisWeek, cur
             <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
               {stat.label}
             </Text>
-            <Text size="xl" fw={700} mt={4}>
-              {values[stat.key]}
-            </Text>
+            <AnimatedCounter
+              value={values[stat.key]}
+              size="xl"
+              fw={800}
+              mt={4}
+              suffix={stat.suffix}
+            />
           </Paper>
         </motion.div>
       ))}
