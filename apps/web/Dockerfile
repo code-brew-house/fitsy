@@ -3,6 +3,9 @@ RUN corepack enable
 
 FROM base AS builder
 WORKDIR /app
+# NEXT_PUBLIC_API_URL must be set at build time (baked into the bundle)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/shared/package.json ./packages/shared/
