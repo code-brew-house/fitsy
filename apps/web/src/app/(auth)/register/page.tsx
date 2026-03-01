@@ -32,8 +32,10 @@ export default function RegisterPage() {
       }
       if (values.inviteCode) {
         await api.post('/family/join', { inviteCode: values.inviteCode });
+        router.push('/dashboard');
+      } else {
+        router.push('/setup-family');
       }
-      router.push('/dashboard');
     } catch (err) {
       notifications.show({
         title: 'Registration failed',

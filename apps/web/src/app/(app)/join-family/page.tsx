@@ -34,7 +34,7 @@ export default function JoinFamilyPage() {
         message: 'You have successfully joined the family.',
         color: 'teal',
       });
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } catch (err) {
       notifications.show({
         title: 'Error',

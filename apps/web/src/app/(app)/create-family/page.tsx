@@ -34,7 +34,7 @@ export default function CreateFamilyPage() {
         message: 'Your family has been created successfully.',
         color: 'teal',
       });
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } catch (err) {
       notifications.show({
         title: 'Error',
