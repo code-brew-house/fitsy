@@ -27,9 +27,8 @@ COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder /app/apps/api/package.json ./apps/api/
-# shared dist is required at runtime — pnpm symlink in node_modules points here
-COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
-COPY --from=builder /app/packages/shared/package.json ./packages/shared/
+# Copy entire shared package — node_modules/zod symlink needed for runtime resolution
+COPY --from=builder /app/packages/shared ./packages/shared
 
 WORKDIR /app/apps/api
 EXPOSE 4000
