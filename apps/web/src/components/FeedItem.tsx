@@ -28,6 +28,7 @@ import type {
 import { ALLOWED_EMOJIS } from '@fitsy/shared';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth-context';
+import { UserLink } from './UserLink';
 
 interface FeedItemProps {
   activity: ActivityLogResponse;
@@ -187,9 +188,7 @@ export function FeedItem({ activity }: FeedItemProps) {
         </Avatar>
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Text size="sm" lineClamp={1}>
-            <Text span fw={600}>
-              {activity.userName}
-            </Text>{' '}
+            <UserLink userId={activity.userId} name={activity.userName} />{' '}
             did{' '}
             <Text span fw={600}>
               {activity.activityTypeName}
@@ -288,9 +287,7 @@ export function FeedItem({ activity }: FeedItemProps) {
                 ) : (
                   <Group gap="xs" justify="space-between" wrap="nowrap">
                     <Text size="xs">
-                      <Text span fw={700}>
-                        {comment.userName}
-                      </Text>{' '}
+                      <UserLink userId={comment.userId} name={comment.userName} size="xs" fw={700} />{' '}
                       {comment.text}{' '}
                       <Text span c="dimmed">
                         {timeAgo(comment.createdAt)}
