@@ -61,7 +61,7 @@ export function ProfileView({ userId, isOwnProfile }: ProfileViewProps) {
       .get<ProfileResponse>(`/users/${userId}/profile`)
       .then(setProfile)
       .catch((err) => {
-        if (err?.message?.includes('403')) {
+        if ((err as any)?.status === 403) {
           setError('You can only view profiles of family members');
         } else {
           setError('Member not found');

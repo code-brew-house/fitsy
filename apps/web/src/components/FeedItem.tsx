@@ -26,6 +26,7 @@ import type {
   ReactionSummary,
 } from '@fitsy/shared';
 import { ALLOWED_EMOJIS } from '@fitsy/shared';
+import Link from 'next/link';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth-context';
 import { UserLink } from './UserLink';
@@ -183,9 +184,11 @@ export function FeedItem({ activity }: FeedItemProps) {
     <Stack gap="xs">
       {/* Main activity line */}
       <Group gap="sm" wrap="nowrap">
-        <Avatar color="teal" radius="xl" size="md">
-          {initial}
-        </Avatar>
+        <Link href={`/profile/${activity.userId}`} style={{ textDecoration: 'none' }}>
+          <Avatar color="teal" radius="xl" size="md" style={{ cursor: 'pointer' }}>
+            {initial}
+          </Avatar>
+        </Link>
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Text size="sm" lineClamp={1}>
             <UserLink userId={activity.userId} name={activity.userName} />{' '}
