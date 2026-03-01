@@ -1,9 +1,9 @@
 import { Controller, Get, Query, UseGuards, Request } from '@nestjs/common';
 import { LeaderboardService } from './leaderboard.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BetterAuthGuard } from '../auth/better-auth.guard';
 
 @Controller('leaderboard')
-@UseGuards(JwtAuthGuard)
+@UseGuards(BetterAuthGuard)
 export class LeaderboardController {
   constructor(private leaderboardService: LeaderboardService) {}
 
@@ -18,7 +18,7 @@ export class LeaderboardController {
       : 'week';
 
     const familyId = await this.leaderboardService.getUserFamilyId(
-      req.user.userId,
+      req.user.id,
     );
     return this.leaderboardService.getRankings(familyId, selectedPeriod);
   }

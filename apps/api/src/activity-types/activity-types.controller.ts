@@ -12,14 +12,14 @@ import {
 } from '@nestjs/common';
 import { ActivityTypesService } from './activity-types.service';
 import { FamilyService } from '../family/family.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BetterAuthGuard } from '../auth/better-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role, createActivityTypeSchema, updateActivityTypeSchema } from '@fitsy/shared';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
 @Controller('activity-types')
-@UseGuards(JwtAuthGuard)
+@UseGuards(BetterAuthGuard)
 export class ActivityTypesController {
   constructor(
     private activityTypesService: ActivityTypesService,
@@ -31,7 +31,7 @@ export class ActivityTypesController {
     @Request() req: any,
     @Query('includeInactive') includeInactive?: string,
   ) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
     return this.activityTypesService.findAll(familyId, includeInactive === 'true');
   }
 
@@ -42,7 +42,7 @@ export class ActivityTypesController {
     @Request() req: any,
     @Body(new ZodValidationPipe(createActivityTypeSchema)) body: any,
   ) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
     return this.activityTypesService.create(familyId, body);
   }
 
@@ -54,7 +54,7 @@ export class ActivityTypesController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateActivityTypeSchema)) body: any,
   ) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
     return this.activityTypesService.update(familyId, id, body);
   }
 
@@ -62,7 +62,7 @@ export class ActivityTypesController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async remove(@Request() req: any, @Param('id') id: string) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
     return this.activityTypesService.remove(familyId, id);
   }
 }

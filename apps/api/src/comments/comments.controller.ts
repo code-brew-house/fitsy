@@ -11,12 +11,12 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BetterAuthGuard } from '../auth/better-auth.guard';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { createCommentSchema, updateCommentSchema } from '@fitsy/shared';
 
 @Controller('activity-logs/:activityLogId/comments')
-@UseGuards(JwtAuthGuard)
+@UseGuards(BetterAuthGuard)
 export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
@@ -27,7 +27,7 @@ export class CommentsController {
   ) {
     return this.commentsService.findByActivityLog(
       activityLogId,
-      req.user.userId,
+      req.user.id,
     );
   }
 
@@ -37,7 +37,7 @@ export class CommentsController {
     @Param('activityLogId') activityLogId: string,
     @Body(new ZodValidationPipe(createCommentSchema)) body: any,
   ) {
-    return this.commentsService.create(activityLogId, req.user.userId, body);
+    return this.commentsService.create(activityLogId, req.user.id, body);
   }
 
   @Patch(':commentId')
@@ -46,7 +46,7 @@ export class CommentsController {
     @Param('commentId') commentId: string,
     @Body(new ZodValidationPipe(updateCommentSchema)) body: any,
   ) {
-    return this.commentsService.update(commentId, req.user.userId, body);
+    return this.commentsService.update(commentId, req.user.id, body);
   }
 
   @Delete(':commentId')
@@ -55,6 +55,6 @@ export class CommentsController {
     @Request() req: any,
     @Param('commentId') commentId: string,
   ) {
-    await this.commentsService.remove(commentId, req.user.userId);
+    await this.commentsService.remove(commentId, req.user.id);
   }
 }

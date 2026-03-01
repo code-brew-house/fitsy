@@ -11,14 +11,14 @@ import {
   Request,
 } from '@nestjs/common';
 import { RewardsService } from './rewards.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BetterAuthGuard } from '../auth/better-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role, createRewardSchema, updateRewardSchema } from '@fitsy/shared';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
 @Controller('rewards')
-@UseGuards(JwtAuthGuard)
+@UseGuards(BetterAuthGuard)
 export class RewardsController {
   constructor(private rewardsService: RewardsService) {}
 
@@ -27,7 +27,7 @@ export class RewardsController {
     @Request() req: any,
     @Query('includeInactive') includeInactive?: string,
   ) {
-    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.userId);
+    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.id);
     return this.rewardsService.findAll(familyId, includeInactive === 'true');
   }
 
@@ -38,7 +38,7 @@ export class RewardsController {
     @Request() req: any,
     @Body(new ZodValidationPipe(createRewardSchema)) body: any,
   ) {
-    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.userId);
+    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.id);
     return this.rewardsService.create(familyId, body);
   }
 
@@ -50,7 +50,7 @@ export class RewardsController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateRewardSchema)) body: any,
   ) {
-    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.userId);
+    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.id);
     return this.rewardsService.update(familyId, id, body);
   }
 
@@ -58,7 +58,7 @@ export class RewardsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async remove(@Request() req: any, @Param('id') id: string) {
-    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.userId);
+    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.id);
     return this.rewardsService.remove(familyId, id);
   }
 }

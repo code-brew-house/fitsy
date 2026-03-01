@@ -10,14 +10,14 @@ import {
   Request,
 } from '@nestjs/common';
 import { FamilyService } from './family.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BetterAuthGuard } from '../auth/better-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role, createFamilySchema, joinFamilySchema, updateFamilySchema } from '@fitsy/shared';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
 @Controller('family')
-@UseGuards(JwtAuthGuard)
+@UseGuards(BetterAuthGuard)
 export class FamilyController {
   constructor(private familyService: FamilyService) {}
 
@@ -26,7 +26,7 @@ export class FamilyController {
     @Request() req: any,
     @Body(new ZodValidationPipe(createFamilySchema)) body: any,
   ) {
-    return this.familyService.createFamily(req.user.userId, body);
+    return this.familyService.createFamily(req.user.id, body);
   }
 
   @Post('join')
@@ -34,12 +34,12 @@ export class FamilyController {
     @Request() req: any,
     @Body(new ZodValidationPipe(joinFamilySchema)) body: any,
   ) {
-    return this.familyService.joinFamily(req.user.userId, body);
+    return this.familyService.joinFamily(req.user.id, body);
   }
 
   @Get()
   async getFamily(@Request() req: any) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
     return this.familyService.getFamily(familyId);
   }
 
@@ -50,7 +50,7 @@ export class FamilyController {
     @Request() req: any,
     @Body(new ZodValidationPipe(updateFamilySchema)) body: any,
   ) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
     return this.familyService.updateFamily(familyId, body);
   }
 
@@ -58,13 +58,13 @@ export class FamilyController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async regenerateCode(@Request() req: any) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
     return this.familyService.regenerateInviteCode(familyId);
   }
 
   @Get('members')
   async getMembers(@Request() req: any) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
     return this.familyService.getMembers(familyId);
   }
 
@@ -72,7 +72,7 @@ export class FamilyController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async removeMember(@Request() req: any, @Param('id') memberId: string) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.userId);
-    return this.familyService.removeMember(familyId, memberId, req.user.userId);
+    const familyId = await this.familyService.getUserFamilyId(req.user.id);
+    return this.familyService.removeMember(familyId, memberId, req.user.id);
   }
 }

@@ -8,12 +8,12 @@ import {
   Request,
 } from '@nestjs/common';
 import { ReactionsService } from './reactions.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BetterAuthGuard } from '../auth/better-auth.guard';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { toggleReactionSchema } from '@fitsy/shared';
 
 @Controller('activity-logs/:activityLogId/reactions')
-@UseGuards(JwtAuthGuard)
+@UseGuards(BetterAuthGuard)
 export class ReactionsController {
   constructor(private reactionsService: ReactionsService) {}
 
@@ -25,7 +25,7 @@ export class ReactionsController {
   ) {
     return this.reactionsService.toggle(
       activityLogId,
-      req.user.userId,
+      req.user.id,
       body,
     );
   }
@@ -37,7 +37,7 @@ export class ReactionsController {
   ) {
     return this.reactionsService.getSummary(
       activityLogId,
-      req.user.userId,
+      req.user.id,
     );
   }
 }

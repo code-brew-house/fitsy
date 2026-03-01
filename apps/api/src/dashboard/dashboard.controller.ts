@@ -1,14 +1,14 @@
 import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BetterAuthGuard } from '../auth/better-auth.guard';
 
 @Controller('dashboard')
-@UseGuards(JwtAuthGuard)
+@UseGuards(BetterAuthGuard)
 export class DashboardController {
   constructor(private dashboardService: DashboardService) {}
 
   @Get()
   async getDashboard(@Request() req: any) {
-    return this.dashboardService.getDashboard(req.user.userId);
+    return this.dashboardService.getDashboard(req.user.id);
   }
 }

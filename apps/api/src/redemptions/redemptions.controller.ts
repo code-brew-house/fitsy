@@ -9,14 +9,14 @@ import {
   Request,
 } from '@nestjs/common';
 import { RedemptionsService } from './redemptions.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BetterAuthGuard } from '../auth/better-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role, createRedemptionSchema } from '@fitsy/shared';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
 @Controller('redemptions')
-@UseGuards(JwtAuthGuard)
+@UseGuards(BetterAuthGuard)
 export class RedemptionsController {
   constructor(private redemptionsService: RedemptionsService) {}
 
@@ -25,12 +25,12 @@ export class RedemptionsController {
     @Request() req: any,
     @Body(new ZodValidationPipe(createRedemptionSchema)) body: any,
   ) {
-    return this.redemptionsService.create(req.user.userId, body);
+    return this.redemptionsService.create(req.user.id, body);
   }
 
   @Get()
   async findOwn(@Request() req: any) {
-    return this.redemptionsService.findOwn(req.user.userId);
+    return this.redemptionsService.findOwn(req.user.id);
   }
 
   @Get('all')
@@ -38,7 +38,7 @@ export class RedemptionsController {
   @Roles(Role.ADMIN)
   async findAll(@Request() req: any) {
     const familyId = await this.redemptionsService.getFamilyIdForUser(
-      req.user.userId,
+      req.user.id,
     );
     return this.redemptionsService.findAll(familyId);
   }
@@ -48,7 +48,7 @@ export class RedemptionsController {
   @Roles(Role.ADMIN)
   async fulfill(@Request() req: any, @Param('id') id: string) {
     const familyId = await this.redemptionsService.getFamilyIdForUser(
-      req.user.userId,
+      req.user.id,
     );
     return this.redemptionsService.fulfill(familyId, id);
   }
@@ -58,7 +58,7 @@ export class RedemptionsController {
   @Roles(Role.ADMIN)
   async cancel(@Request() req: any, @Param('id') id: string) {
     const familyId = await this.redemptionsService.getFamilyIdForUser(
-      req.user.userId,
+      req.user.id,
     );
     return this.redemptionsService.cancel(familyId, id);
   }
