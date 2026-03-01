@@ -119,14 +119,8 @@ export class ActivityLogsService {
   }
 
   async findFeed(familyId: string, userId: string, limit: number = 20) {
-    const users = await this.prisma.user.findMany({
-      where: { familyId },
-      select: { id: true },
-    });
-    const userIds = users.map((u) => u.id);
-
     const logs = await this.prisma.activityLog.findMany({
-      where: { userId: { in: userIds } },
+      where: { user: { familyId } },
       include: {
         activityType: { select: { name: true, icon: true } },
         user: { select: { name: true } },
