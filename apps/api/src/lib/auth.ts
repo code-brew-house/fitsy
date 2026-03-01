@@ -50,6 +50,13 @@ export const auth = betterAuth({
   trustedOrigins: [
     process.env.CORS_ORIGIN || 'http://localhost:3000',
   ],
+
+  advanced: {
+    useSecureCookies: process.env.NODE_ENV === 'production',
+    crossSubDomainCookies: process.env.COOKIE_DOMAIN
+      ? { enabled: true, domain: process.env.COOKIE_DOMAIN }
+      : { enabled: false },
+  },
 });
 
 export type Auth = typeof auth;
