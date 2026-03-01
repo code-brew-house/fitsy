@@ -22,7 +22,8 @@ Set the following environment variables in the Dokploy dashboard:
 
 ```
 DATABASE_URL=postgresql://user:pass@host:5432/fitsy
-JWT_SECRET=<generate with: openssl rand -base64 32>
+BETTER_AUTH_SECRET=<generate with: openssl rand -base64 32>
+BETTER_AUTH_URL=https://your-api-domain.com
 CORS_ORIGIN=https://your-web-domain.com
 NEXT_PUBLIC_API_URL=https://your-api-domain.com
 ```
@@ -42,7 +43,8 @@ NEXT_PUBLIC_API_URL=https://your-api-domain.com
 4. Environment variables:
    ```
    DATABASE_URL=postgresql://user:pass@host:5432/fitsy
-   JWT_SECRET=<random secret>
+   BETTER_AUTH_SECRET=<generate with: openssl rand -base64 32>
+   BETTER_AUTH_URL=https://your-api-domain.com
    CORS_ORIGIN=https://your-web-domain.com
    PORT=4000
    ```
@@ -86,9 +88,10 @@ Set `CORS_ORIGIN` in the API to match the web domain exactly.
 ## First Deploy Checklist
 
 - [ ] PostgreSQL database created and connection string ready
-- [ ] `JWT_SECRET` generated (`openssl rand -base64 32`)
+- [ ] `BETTER_AUTH_SECRET` generated (`openssl rand -base64 32`)
+- [ ] `BETTER_AUTH_URL` set to the public API URL
 - [ ] `NEXT_PUBLIC_API_URL` set to the public API URL (build arg for web)
 - [ ] `CORS_ORIGIN` set to the public web URL
 - [ ] Domains configured in Dokploy
 - [ ] Both services deployed and healthy
-- [ ] Verify `/auth/register` and `/auth/login` work end-to-end
+- [ ] Verify `/api/auth/sign-up/email` and `/api/auth/sign-in/email` work end-to-end
