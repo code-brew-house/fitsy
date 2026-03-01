@@ -245,6 +245,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   height: '100%',
+                  width: '100%',
                 }}
               >
                 <motion.div whileTap={{ scale: 0.85 }}>
