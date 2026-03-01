@@ -14,7 +14,7 @@ import {
   Box,
   Stack,
 } from '@mantine/core';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useDisclosure } from '@mantine/hooks';
 import { motion } from 'framer-motion';
 import {
   IconDashboard,
@@ -67,7 +67,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { vibrate } = useHaptics();
 
   const isAdmin = user?.role === Role.ADMIN;
-  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const navigate = (href: string) => {
     vibrate('tap');
@@ -80,6 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <MantineAppShell
       header={{ height: 60 }}
+      footer={{ height: 60 }}
       navbar={{
         width: 260,
         breakpoint: 'sm',
@@ -199,86 +199,79 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </MantineAppShell.Navbar>
 
       <MantineAppShell.Main>
-        <Box pb={isMobile ? 80 : 0}>
-          <PageTransition>{children}</PageTransition>
-        </Box>
-
-        <Box
-          hiddenFrom="sm"
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            borderTop: '1px solid var(--mantine-color-default-border)',
-            backgroundColor: 'var(--mantine-color-body)',
-            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          }}
-        >
-          <Group grow gap={0} h={60} align="stretch" style={{ position: 'relative' }}>
-            {activeTabIndex >= 0 && (
-              <motion.div
-                layoutId="bottomNavIndicator"
-                style={{
-                  position: 'absolute',
-                  top: 2,
-                  width: `${100 / mainNav.length}%`,
-                  left: `${(activeTabIndex * 100) / mainNav.length}%`,
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
-                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              >
-                <Box
-                  style={{
-                    width: 24,
-                    height: 3,
-                    borderRadius: 2,
-                    backgroundColor: 'var(--mantine-color-indigo-6)',
-                  }}
-                />
-              </motion.div>
-            )}
-            {mainNav.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <UnstyledButton
-                  key={item.href}
-                  onClick={() => navigate(item.href)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100%',
-                  }}
-                >
-                  <motion.div whileTap={{ scale: 0.85 }}>
-                    <Stack align="center" gap={2}>
-                      <item.icon
-                        size={22}
-                        color={
-                          isActive
-                            ? 'var(--mantine-color-indigo-6)'
-                            : 'var(--mantine-color-dimmed)'
-                        }
-                        strokeWidth={isActive ? 2.5 : 1.5}
-                      />
-                      <Text
-                        size="xs"
-                        c={isActive ? 'indigo' : 'dimmed'}
-                        fw={isActive ? 700 : 400}
-                      >
-                        {item.label}
-                      </Text>
-                    </Stack>
-                  </motion.div>
-                </UnstyledButton>
-              );
-            })}
-          </Group>
-        </Box>
+        <PageTransition>{children}</PageTransition>
       </MantineAppShell.Main>
+
+      <MantineAppShell.Footer
+        hiddenFrom="sm"
+        style={{
+          borderTop: '1px solid var(--mantine-color-default-border)',
+          backgroundColor: 'var(--mantine-color-body)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+      >
+        <Group grow gap={0} h={60} style={{ position: 'relative' }}>
+          {activeTabIndex >= 0 && (
+            <motion.div
+              layoutId="bottomNavIndicator"
+              style={{
+                position: 'absolute',
+                top: 2,
+                width: `${100 / mainNav.length}%`,
+                left: `${(activeTabIndex * 100) / mainNav.length}%`,
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+            >
+              <Box
+                style={{
+                  width: 24,
+                  height: 3,
+                  borderRadius: 2,
+                  backgroundColor: 'var(--mantine-color-indigo-6)',
+                }}
+              />
+            </motion.div>
+          )}
+          {mainNav.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <UnstyledButton
+                key={item.href}
+                onClick={() => navigate(item.href)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                }}
+              >
+                <motion.div whileTap={{ scale: 0.85 }}>
+                  <Stack align="center" gap={2}>
+                    <item.icon
+                      size={22}
+                      color={
+                        isActive
+                          ? 'var(--mantine-color-indigo-6)'
+                          : 'var(--mantine-color-dimmed)'
+                      }
+                      strokeWidth={isActive ? 2.5 : 1.5}
+                    />
+                    <Text
+                      size="xs"
+                      c={isActive ? 'indigo' : 'dimmed'}
+                      fw={isActive ? 700 : 400}
+                    >
+                      {item.label}
+                    </Text>
+                  </Stack>
+                </motion.div>
+              </UnstyledButton>
+            );
+          })}
+        </Group>
+      </MantineAppShell.Footer>
     </MantineAppShell>
   );
 }
