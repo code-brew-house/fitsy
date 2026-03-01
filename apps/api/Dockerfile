@@ -10,8 +10,10 @@ RUN pnpm install --frozen-lockfile
 
 COPY packages/shared ./packages/shared
 COPY apps/api ./apps/api
+# Build shared first (its dist/index.js is required by the API at compile and runtime)
+RUN pnpm --filter=@fitsy/shared run build
 RUN cd apps/api && npx prisma generate
-RUN pnpm turbo run build --filter=@fitsy/api
+RUN pnpm --filter=@fitsy/api run build
 
 FROM base AS runner
 WORKDIR /app
@@ -25,6 +27,9 @@ COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder /app/apps/api/package.json ./apps/api/
+# shared dist is required at runtime — pnpm symlink in node_modules points here
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 
 WORKDIR /app/apps/api
 EXPOSE 4000
