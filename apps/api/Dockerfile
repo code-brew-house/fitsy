@@ -31,5 +31,5 @@ COPY --from=builder /app/apps/api/package.json ./apps/api/
 COPY --from=builder /app/packages/shared ./packages/shared
 
 WORKDIR /app/apps/api
-EXPOSE 4000
+EXPOSE 3000
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
