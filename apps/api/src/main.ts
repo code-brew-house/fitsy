@@ -3,7 +3,8 @@ import {
   ExpressAdapter,
   NestExpressApplication,
 } from '@nestjs/platform-express';
-import express from 'express';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const express = require('express') as typeof import('express');
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
 import { AppModule } from './app.module';
