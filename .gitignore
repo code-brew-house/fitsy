@@ -6,6 +6,9 @@ dist/
 .env.local
 *.log
 
+# Worktrees
+.worktrees/
+
 # Screenshots and build artifacts
 .playwright-mcp/
 *.png
