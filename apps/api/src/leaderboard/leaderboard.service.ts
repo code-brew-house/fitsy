@@ -21,44 +21,47 @@ export class LeaderboardService {
     familyId: string,
     period: 'week' | 'month' | 'alltime',
   ): Promise<LeaderboardEntry[]> {
-    const now = new Date();
-    let dateFilter: Date | undefined;
-
-    if (period === 'week') {
-      dateFilter = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    } else if (period === 'month') {
-      dateFilter = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    // For all-time, use pre-computed totalPoints on User (no aggregation needed)
+    if (period === 'alltime') {
+      const members = await this.prisma.user.findMany({
+        where: { familyId },
+        select: { id: true, name: true, image: true, totalPoints: true },
+        orderBy: { totalPoints: 'desc' },
+      });
+      return members.map((m) => ({
+        userId: m.id,
+        userName: m.name,
+        avatarUrl: m.image,
+        totalPoints: m.totalPoints,
+        activityCount: 0,
+      }));
     }
 
-    // Get all family members
+    const now = new Date();
+    const dateFilter =
+      period === 'week'
+        ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        : new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
     const familyMembers = await this.prisma.user.findMany({
       where: { familyId },
-      select: { id: true, name: true, avatarUrl: true },
+      select: { id: true, name: true, image: true },
     });
 
-    if (familyMembers.length === 0) {
-      return [];
-    }
+    if (familyMembers.length === 0) return [];
 
     const memberIds = familyMembers.map((m) => m.id);
 
-    // Build activity log query with date filter
-    const whereClause: any = {
-      userId: { in: memberIds },
-    };
-    if (dateFilter) {
-      whereClause.createdAt = { gte: dateFilter };
-    }
-
-    // Group activity logs by user
     const aggregations = await this.prisma.activityLog.groupBy({
       by: ['userId'],
-      where: whereClause,
+      where: {
+        userId: { in: memberIds },
+        createdAt: { gte: dateFilter },
+      },
       _sum: { pointsEarned: true },
       _count: { id: true },
     });
 
-    // Build a map of userId -> aggregation
     const aggMap = new Map(
       aggregations.map((a) => [
         a.userId,
@@ -69,21 +72,18 @@ export class LeaderboardService {
       ]),
     );
 
-    // Merge with user data
     const entries: LeaderboardEntry[] = familyMembers.map((member) => {
       const agg = aggMap.get(member.id);
       return {
         userId: member.id,
         userName: member.name,
-        avatarUrl: member.avatarUrl,
+        avatarUrl: member.image,
         totalPoints: agg?.totalPoints ?? 0,
         activityCount: agg?.activityCount ?? 0,
       };
     });
 
-    // Sort by totalPoints descending
     entries.sort((a, b) => b.totalPoints - a.totalPoints);
-
     return entries;
   }
 }

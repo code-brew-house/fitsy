@@ -18,7 +18,7 @@ const DEFAULT_ACTIVITIES = [
 ];
 
 function generateInviteCode(): string {
-  return randomBytes(4).toString('hex').toUpperCase();
+  return randomBytes(8).toString('hex').toUpperCase();
 }
 
 @Injectable()
@@ -108,7 +108,7 @@ export class FamilyService {
         name: true,
         email: true,
         role: true,
-        avatarUrl: true,
+        image: true,
         totalPoints: true,
         createdAt: true,
       },
