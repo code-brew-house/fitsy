@@ -53,10 +53,13 @@ export class RedemptionsService {
       });
 
       if (reward.quantity !== null) {
-        await tx.reward.update({
-          where: { id: dto.rewardId },
+        const updated = await tx.reward.updateMany({
+          where: { id: dto.rewardId, quantity: { gt: 0 } },
           data: { quantity: { decrement: 1 } },
         });
+        if (updated.count === 0) {
+          throw new BadRequestException('Reward out of stock');
+        }
       }
 
       const creator = await tx.user.findUnique({
