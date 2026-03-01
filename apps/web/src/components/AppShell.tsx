@@ -30,10 +30,12 @@ import {
 } from '@tabler/icons-react';
 import { Role } from '@fitsy/shared';
 import { useAuth } from '../lib/auth-context';
+import { useMediaQuery } from '@mantine/hooks';
 import { ThemeToggle } from './ThemeToggle';
 import { PointsBadge } from './PointsBadge';
 import { FitsyLogo } from './FitsyLogo';
 import { PwaInstallButton } from './PwaInstallButton';
+import { PageTransition } from './PageTransition';
 
 const mainNav = [
   { label: 'Dashboard', icon: IconDashboard, href: '/dashboard' },
@@ -63,6 +65,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [opened, { toggle, close }] = useDisclosure(false);
 
   const isAdmin = user?.role === Role.ADMIN;
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const navigate = (href: string) => {
     router.push(href);
@@ -186,7 +189,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <MantineAppShell.Main>
-        {children}
+        <Box pb={isMobile ? 80 : 0}>
+          <PageTransition>{children}</PageTransition>
+        </Box>
 
         {/* Mobile bottom navigation */}
         <Box

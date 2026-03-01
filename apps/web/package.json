@@ -11,10 +11,11 @@
   "dependencies": {
     "@fitsy/shared": "workspace:*",
     "@mantine/core": "^7.15.0",
-    "@mantine/hooks": "^7.15.0",
     "@mantine/form": "^7.15.0",
+    "@mantine/hooks": "^7.15.0",
     "@mantine/notifications": "^7.15.0",
     "@tabler/icons-react": "^3.0.0",
+    "framer-motion": "^12.34.3",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

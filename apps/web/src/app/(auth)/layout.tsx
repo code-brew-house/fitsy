@@ -1,12 +1,19 @@
 'use client';
 
 import { Center, Container } from '@mantine/core';
+import { motion } from 'framer-motion';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <Center mih="100vh">
       <Container size={420} w="100%">
-        {children}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {children}
+        </motion.div>
       </Container>
     </Center>
   );
