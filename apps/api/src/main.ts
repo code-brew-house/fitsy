@@ -14,7 +14,7 @@ async function bootstrap() {
 
   // Mount BetterAuth BEFORE NestJS body parser
   // BetterAuth handles all /api/auth/* routes
-  server.all('/api/auth/*', toNodeHandler(auth));
+  server.all('/api/auth/*path', toNodeHandler(auth));
 
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
