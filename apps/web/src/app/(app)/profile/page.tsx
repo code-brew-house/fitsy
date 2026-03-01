@@ -10,7 +10,7 @@ export default function ProfilePage() {
   if (loading || !user) {
     return (
       <Center py="xl">
-        <Loader color="teal" />
+        <Loader color="indigo" />
       </Center>
     );
   }

@@ -216,7 +216,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           }}
         >
-          <Group grow gap={0} h={60} style={{ position: 'relative' }}>
+          <Group grow gap={0} h={60} align="stretch" style={{ position: 'relative' }}>
             {activeTabIndex >= 0 && (
               <motion.div
                 layoutId="bottomNavIndicator"
@@ -246,8 +246,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <UnstyledButton
                   key={item.href}
                   onClick={() => navigate(item.href)}
-                  style={{ textAlign: 'center' }}
-                  py="xs"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                  }}
                 >
                   <motion.div whileTap={{ scale: 0.85 }}>
                     <Stack align="center" gap={2}>

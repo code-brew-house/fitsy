@@ -25,7 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <Center mih="100vh">
-        <Loader color="teal" size="lg" />
+        <Loader color="indigo" size="lg" />
       </Center>
     );
   }

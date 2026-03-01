@@ -32,7 +32,7 @@ export default function JoinFamilyPage() {
       notifications.show({
         title: 'Joined family!',
         message: 'You have successfully joined the family.',
-        color: 'teal',
+        color: 'indigo',
       });
       window.location.href = '/dashboard';
     } catch (err) {
@@ -49,7 +49,7 @@ export default function JoinFamilyPage() {
   return (
     <Container size="xs" mt="xl">
       <Stack align="center" gap="lg">
-        <IconUserPlus size={48} color="var(--mantine-color-teal-6)" />
+        <IconUserPlus size={48} color="var(--mantine-color-indigo-6)" />
         <Title order={2} ta="center">
           Join a Family
         </Title>
@@ -69,7 +69,7 @@ export default function JoinFamilyPage() {
               />
               <Button
                 type="submit"
-                color="teal"
+                color="indigo"
                 fullWidth
                 loading={loading}
               >

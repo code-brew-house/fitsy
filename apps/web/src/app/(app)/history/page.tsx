@@ -125,7 +125,7 @@ export default function HistoryPage() {
 
         {loading ? (
           <Center py="xl">
-            <Loader color="teal" />
+            <Loader color="indigo" />
           </Center>
         ) : logs.length === 0 ? (
           <Center py="xl">
@@ -150,7 +150,7 @@ export default function HistoryPage() {
                         <Text size="xs" c="dimmed">{formatDate(log.createdAt)}</Text>
                         <Text size="sm">{formatMeasurement(log)}</Text>
                       </Stack>
-                      <Text fw={700} c="teal">+{log.pointsEarned} pts</Text>
+                      <Text fw={700} c="indigo">+{log.pointsEarned} pts</Text>
                     </Group>
                   </Paper>
                 ))}
@@ -173,7 +173,7 @@ export default function HistoryPage() {
                         {log.activityTypeIcon} {log.activityTypeName}
                       </Table.Td>
                       <Table.Td>{formatMeasurement(log)}</Table.Td>
-                      <Table.Td ta="right" fw={600} c="teal">
+                      <Table.Td ta="right" fw={600} c="indigo">
                         +{log.pointsEarned}
                       </Table.Td>
                     </Table.Tr>
@@ -188,7 +188,7 @@ export default function HistoryPage() {
                   total={totalPages}
                   value={page}
                   onChange={setPage}
-                  color="teal"
+                  color="indigo"
                 />
               </Center>
             )}

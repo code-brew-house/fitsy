@@ -62,7 +62,7 @@ export default function RedemptionsPage() {
 
         {loading ? (
           <Center py="xl">
-            <Loader color="teal" />
+            <Loader color="indigo" />
           </Center>
         ) : redemptions.length === 0 ? (
           <Center py="xl">

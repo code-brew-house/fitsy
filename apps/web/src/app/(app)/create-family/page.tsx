@@ -32,7 +32,7 @@ export default function CreateFamilyPage() {
       notifications.show({
         title: 'Family created!',
         message: 'Your family has been created successfully.',
-        color: 'teal',
+        color: 'indigo',
       });
       window.location.href = '/dashboard';
     } catch (err) {
@@ -49,7 +49,7 @@ export default function CreateFamilyPage() {
   return (
     <Container size="xs" mt="xl">
       <Stack align="center" gap="lg">
-        <IconUsers size={48} color="var(--mantine-color-teal-6)" />
+        <IconUsers size={48} color="var(--mantine-color-indigo-6)" />
         <Title order={2} ta="center">
           Create Your Family
         </Title>
@@ -69,7 +69,7 @@ export default function CreateFamilyPage() {
               />
               <Button
                 type="submit"
-                color="teal"
+                color="indigo"
                 fullWidth
                 loading={loading}
               >

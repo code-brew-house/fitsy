@@ -51,7 +51,7 @@ export default function AdminRedemptionsPage() {
     setFulfillingId(id);
     try {
       await api.patch(`/redemptions/${id}/fulfill`, {});
-      notifications.show({ title: 'Fulfilled', message: 'Redemption marked as fulfilled', color: 'teal' });
+      notifications.show({ title: 'Fulfilled', message: 'Redemption marked as fulfilled', color: 'indigo' });
       await fetchRedemptions();
     } catch (err) {
       notifications.show({
@@ -71,7 +71,7 @@ export default function AdminRedemptionsPage() {
   if (loading) {
     return (
       <Container size="lg">
-        <Center py="xl"><Loader color="teal" /></Center>
+        <Center py="xl"><Loader color="indigo" /></Center>
       </Container>
     );
   }
@@ -112,7 +112,7 @@ export default function AdminRedemptionsPage() {
                 <Table.Td>{r.userName}</Table.Td>
                 <Table.Td>{r.rewardName}</Table.Td>
                 <Table.Td>
-                  <Badge color="teal" variant="light">{r.pointsSpent}</Badge>
+                  <Badge color="indigo" variant="light">{r.pointsSpent}</Badge>
                 </Table.Td>
                 <Table.Td>
                   <Badge color={statusColors[r.status]}>{r.status}</Badge>
@@ -123,7 +123,7 @@ export default function AdminRedemptionsPage() {
                     <Button
                       size="xs"
                       variant="light"
-                      color="teal"
+                      color="indigo"
                       leftSection={<IconCheck size={14} />}
                       loading={fulfillingId === r.id}
                       onClick={() => handleFulfill(r.id)}

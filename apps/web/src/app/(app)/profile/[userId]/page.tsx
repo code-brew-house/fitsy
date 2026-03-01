@@ -12,7 +12,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ userId
   if (loading) {
     return (
       <Center py="xl">
-        <Loader color="teal" />
+        <Loader color="indigo" />
       </Center>
     );
   }

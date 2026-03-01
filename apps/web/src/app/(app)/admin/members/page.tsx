@@ -63,7 +63,7 @@ export default function AdminMembersPage() {
     try {
       const data = await api.post<FamilyResponse>('/family/regenerate-code', {});
       setFamily(data);
-      notifications.show({ title: 'Success', message: 'Invite code regenerated', color: 'teal' });
+      notifications.show({ title: 'Success', message: 'Invite code regenerated', color: 'indigo' });
     } catch (err) {
       notifications.show({
         title: 'Error',
@@ -79,7 +79,7 @@ export default function AdminMembersPage() {
     if (!window.confirm(`Remove "${memberName}" from the family?`)) return;
     try {
       await api.delete(`/family/members/${memberId}`);
-      notifications.show({ title: 'Removed', message: `${memberName} has been removed`, color: 'teal' });
+      notifications.show({ title: 'Removed', message: `${memberName} has been removed`, color: 'indigo' });
       await fetchData();
     } catch (err) {
       notifications.show({
@@ -93,7 +93,7 @@ export default function AdminMembersPage() {
   if (loading) {
     return (
       <Container size="lg">
-        <Center py="xl"><Loader color="teal" /></Center>
+        <Center py="xl"><Loader color="indigo" /></Center>
       </Container>
     );
   }
@@ -117,7 +117,7 @@ export default function AdminMembersPage() {
                 <CopyButton value={family.inviteCode} timeout={2000}>
                   {({ copied, copy }) => (
                     <Tooltip label={copied ? 'Copied' : 'Copy'} withArrow>
-                      <ActionIcon color={copied ? 'teal' : 'gray'} variant="subtle" onClick={copy} size="lg">
+                      <ActionIcon color={copied ? 'indigo' : 'gray'} variant="subtle" onClick={copy} size="lg">
                         {copied ? <IconCheck size={18} /> : <IconCopy size={18} />}
                       </ActionIcon>
                     </Tooltip>

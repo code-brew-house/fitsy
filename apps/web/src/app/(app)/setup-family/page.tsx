@@ -34,12 +34,12 @@ export default function SetupFamilyPage() {
             onClick={() => router.push('/create-family')}
           >
             <Stack align="center" gap="md">
-              <IconUsers size={40} color="var(--mantine-color-teal-6)" />
+              <IconUsers size={40} color="var(--mantine-color-indigo-6)" />
               <Title order={4} ta="center">Create a Family</Title>
               <Text size="sm" c="dimmed" ta="center">
                 Start a new family group and invite members to join.
               </Text>
-              <Button color="teal" fullWidth onClick={() => router.push('/create-family')}>
+              <Button color="indigo" fullWidth onClick={() => router.push('/create-family')}>
                 Create Family
               </Button>
             </Stack>

@@ -81,7 +81,7 @@ export default function SettingsPage() {
 
             <Group justify="flex-end" mt="sm">
               <Button
-                color="teal"
+                color="indigo"
                 onClick={handleSubmit}
                 loading={saving}
                 disabled={!canSubmit}

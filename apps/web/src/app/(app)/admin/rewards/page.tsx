@@ -98,10 +98,10 @@ export default function AdminRewardsPage() {
 
       if (editingId) {
         await api.patch(`/rewards/${editingId}`, body);
-        notifications.show({ title: 'Updated', message: 'Reward updated', color: 'teal' });
+        notifications.show({ title: 'Updated', message: 'Reward updated', color: 'indigo' });
       } else {
         await api.post('/rewards', body);
-        notifications.show({ title: 'Created', message: 'Reward created', color: 'teal' });
+        notifications.show({ title: 'Created', message: 'Reward created', color: 'indigo' });
       }
       close();
       await fetchRewards();
@@ -120,7 +120,7 @@ export default function AdminRewardsPage() {
     if (!window.confirm(`Delete "${name}"?`)) return;
     try {
       await api.delete(`/rewards/${id}`);
-      notifications.show({ title: 'Deleted', message: `"${name}" deleted`, color: 'teal' });
+      notifications.show({ title: 'Deleted', message: `"${name}" deleted`, color: 'indigo' });
       await fetchRewards();
     } catch (err) {
       notifications.show({
@@ -134,7 +134,7 @@ export default function AdminRewardsPage() {
   if (loading) {
     return (
       <Container size="lg">
-        <Center py="xl"><Loader color="teal" /></Center>
+        <Center py="xl"><Loader color="indigo" /></Center>
       </Container>
     );
   }
@@ -144,7 +144,7 @@ export default function AdminRewardsPage() {
       <Stack gap="md">
         <Group justify="space-between">
           <Title order={2}>Manage Rewards</Title>
-          <Button leftSection={<IconPlus size={16} />} color="teal" onClick={openAdd}>
+          <Button leftSection={<IconPlus size={16} />} color="indigo" onClick={openAdd}>
             Add Reward
           </Button>
         </Group>
@@ -168,7 +168,7 @@ export default function AdminRewardsPage() {
                   <Text size="sm" lineClamp={1}>{r.description}</Text>
                 </Table.Td>
                 <Table.Td>
-                  <Badge color="teal" variant="light">{r.pointCost}</Badge>
+                  <Badge color="indigo" variant="light">{r.pointCost}</Badge>
                 </Table.Td>
                 <Table.Td>{r.quantity ?? 'Unlimited'}</Table.Td>
                 <Table.Td>
@@ -236,7 +236,7 @@ export default function AdminRewardsPage() {
             onChange={(val) => setForm((f) => ({ ...f, quantity: val }))}
             min={1}
           />
-          <Button color="teal" onClick={handleSubmit} loading={saving} fullWidth mt="sm">
+          <Button color="indigo" onClick={handleSubmit} loading={saving} fullWidth mt="sm">
             {editingId ? 'Update' : 'Create'}
           </Button>
         </Stack>

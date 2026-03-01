@@ -151,10 +151,10 @@ export default function AdminActivitiesPage() {
       const body = buildBody();
       if (editingId) {
         await api.patch(`/activity-types/${editingId}`, body);
-        notifications.show({ title: 'Updated', message: 'Activity type updated', color: 'teal' });
+        notifications.show({ title: 'Updated', message: 'Activity type updated', color: 'indigo' });
       } else {
         await api.post('/activity-types', body);
-        notifications.show({ title: 'Created', message: 'Activity type created', color: 'teal' });
+        notifications.show({ title: 'Created', message: 'Activity type created', color: 'indigo' });
       }
       close();
       await fetchActivities();
@@ -173,7 +173,7 @@ export default function AdminActivitiesPage() {
     if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
     try {
       await api.delete(`/activity-types/${id}`);
-      notifications.show({ title: 'Deleted', message: `"${name}" deleted`, color: 'teal' });
+      notifications.show({ title: 'Deleted', message: `"${name}" deleted`, color: 'indigo' });
       await fetchActivities();
     } catch (err) {
       notifications.show({
@@ -200,7 +200,7 @@ export default function AdminActivitiesPage() {
   if (loading) {
     return (
       <Container size="lg">
-        <Center py="xl"><Loader color="teal" /></Center>
+        <Center py="xl"><Loader color="indigo" /></Center>
       </Container>
     );
   }
@@ -210,7 +210,7 @@ export default function AdminActivitiesPage() {
       <Stack gap="md">
         <Group justify="space-between">
           <Title order={2}>Manage Activity Types</Title>
-          <Button leftSection={<IconPlus size={16} />} color="teal" onClick={openAdd}>
+          <Button leftSection={<IconPlus size={16} />} color="indigo" onClick={openAdd}>
             Add Activity
           </Button>
         </Group>
@@ -386,7 +386,7 @@ export default function AdminActivitiesPage() {
             />
           )}
 
-          <Button color="teal" onClick={handleSubmit} loading={saving} fullWidth mt="sm">
+          <Button color="indigo" onClick={handleSubmit} loading={saving} fullWidth mt="sm">
             {editingId ? 'Update' : 'Create'}
           </Button>
         </Stack>

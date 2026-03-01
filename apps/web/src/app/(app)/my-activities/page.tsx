@@ -259,7 +259,7 @@ export default function MyActivitiesPage() {
 
         {loading ? (
           <Center py="xl">
-            <Loader color="teal" />
+            <Loader color="indigo" />
           </Center>
         ) : logs.length === 0 ? (
           <Center py="xl">
@@ -288,7 +288,7 @@ export default function MyActivitiesPage() {
                         )}
                       </Stack>
                       <Stack align="flex-end" gap="xs" style={{ flexShrink: 0 }}>
-                        <Text fw={700} c="teal">+{log.pointsEarned} pts</Text>
+                        <Text fw={700} c="indigo">+{log.pointsEarned} pts</Text>
                         <Group gap="xs">
                           <ActionIcon
                             variant="subtle"
@@ -337,7 +337,7 @@ export default function MyActivitiesPage() {
                           {log.note || '-'}
                         </Text>
                       </Table.Td>
-                      <Table.Td ta="right" fw={600} c="teal">
+                      <Table.Td ta="right" fw={600} c="indigo">
                         +{log.pointsEarned}
                       </Table.Td>
                       <Table.Td>
@@ -372,7 +372,7 @@ export default function MyActivitiesPage() {
                   total={totalPages}
                   value={page}
                   onChange={setPage}
-                  color="teal"
+                  color="indigo"
                 />
               </Center>
             )}
@@ -453,11 +453,11 @@ export default function MyActivitiesPage() {
               maxRows={4}
             />
 
-            <Paper p="md" radius="md" bg="teal.0" ta="center">
+            <Paper p="md" radius="md" bg="indigo.0" ta="center">
               <Text size="sm" c="dimmed">
                 Points after update
               </Text>
-              <Text size="xl" fw={700} c="teal">
+              <Text size="xl" fw={700} c="indigo">
                 {editPointsPreview}
               </Text>
             </Paper>
@@ -467,7 +467,7 @@ export default function MyActivitiesPage() {
                 Cancel
               </Button>
               <Button
-                color="teal"
+                color="indigo"
                 onClick={handleEditSubmit}
                 loading={editSubmitting}
               >
