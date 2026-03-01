@@ -23,7 +23,7 @@ import { RewardCard } from '../../../components/RewardCard';
 import type { RewardResponse } from '@fitsy/shared';
 
 export default function RewardsPage() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const [rewards, setRewards] = useState<RewardResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReward, setSelectedReward] = useState<RewardResponse | null>(null);
@@ -61,7 +61,6 @@ export default function RewardsPage() {
         color: 'teal',
       });
       close();
-      await refreshUser();
       await fetchRewards();
     } catch (err) {
       notifications.show({

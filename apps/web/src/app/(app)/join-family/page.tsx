@@ -15,12 +15,10 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconUserPlus } from '@tabler/icons-react';
 import { api } from '../../../lib/api';
-import { useAuth } from '../../../lib/auth-context';
 import type { FamilyResponse } from '@fitsy/shared';
 
 export default function JoinFamilyPage() {
   const router = useRouter();
-  const { refreshUser } = useAuth();
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +29,6 @@ export default function JoinFamilyPage() {
     setLoading(true);
     try {
       await api.post<FamilyResponse>('/family/join', { inviteCode: inviteCode.trim() });
-      await refreshUser();
       notifications.show({
         title: 'Joined family!',
         message: 'You have successfully joined the family.',

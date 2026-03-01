@@ -31,7 +31,6 @@ import {
 import { MeasurementType, EffortLevel } from '@fitsy/shared';
 import type { ActivityLogResponse, ActivityTypeResponse } from '@fitsy/shared';
 import { api } from '../../../lib/api';
-import { useAuth } from '../../../lib/auth-context';
 
 interface PaginatedResponse {
   data: ActivityLogResponse[];
@@ -68,7 +67,6 @@ function formatDate(dateStr: string): string {
 }
 
 export default function MyActivitiesPage() {
-  const { refreshUser } = useAuth();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [logs, setLogs] = useState<ActivityLogResponse[]>([]);
   const [total, setTotal] = useState(0);
@@ -188,7 +186,6 @@ export default function MyActivitiesPage() {
 
     try {
       await api.patch<ActivityLogResponse>(`/activity-logs/${editingLog.id}`, body);
-      await refreshUser();
       notifications.show({
         title: 'Activity Updated',
         message: `Points updated to ${editPointsPreview}`,
@@ -219,7 +216,6 @@ export default function MyActivitiesPage() {
 
     try {
       await api.delete(`/activity-logs/${deletingLog.id}`);
-      await refreshUser();
       notifications.show({
         title: 'Activity Deleted',
         message: `${deletingLog.pointsEarned} points have been removed`,

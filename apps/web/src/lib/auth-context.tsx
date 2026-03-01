@@ -1,64 +1,61 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from './api';
-import type { UserResponse, AuthResponse, LoginDto, RegisterDto } from '@fitsy/shared';
+import { useSession, signOut } from './auth-client';
+import type { UserResponse } from '@fitsy/shared';
+import { Role } from '@fitsy/shared';
 
 interface AuthContextType {
   user: UserResponse | null;
   loading: boolean;
-  login: (dto: LoginDto) => Promise<void>;
-  register: (dto: RegisterDto) => Promise<void>;
   logout: () => void;
-  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// BetterAuth's session.user type only includes base fields.
+// Our server configures additionalFields (role, familyId, totalPoints)
+// which are present at runtime but not in the generated TS type.
+interface ExtendedSessionUser {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  createdAt: Date;
+  role?: string;
+  familyId?: string | null;
+  totalPoints?: number;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, isPending } = useSession();
   const router = useRouter();
 
-  const refreshUser = useCallback(async () => {
-    try {
-      const data = await api.get<UserResponse>('/auth/me');
-      setUser(data);
-    } catch {
-      api.setToken(null);
-      setUser(null);
-    }
-  }, []);
+  const sessionUser = session?.user as ExtendedSessionUser | undefined;
 
-  useEffect(() => {
-    if (api.getToken()) {
-      refreshUser().finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, [refreshUser]);
+  const user: UserResponse | null = sessionUser
+    ? {
+        id: sessionUser.id,
+        name: sessionUser.name,
+        email: sessionUser.email,
+        role: (sessionUser.role === 'ADMIN' ? Role.ADMIN : Role.MEMBER),
+        familyId: sessionUser.familyId ?? null,
+        totalPoints: sessionUser.totalPoints ?? 0,
+        avatarUrl: sessionUser.image ?? null,
+        createdAt: sessionUser.createdAt
+          ? new Date(sessionUser.createdAt).toISOString()
+          : new Date().toISOString(),
+      }
+    : null;
 
-  const login = async (dto: LoginDto) => {
-    const res = await api.post<AuthResponse>('/auth/login', dto);
-    api.setToken(res.accessToken);
-    setUser(res.user);
-  };
-
-  const register = async (dto: RegisterDto) => {
-    const res = await api.post<AuthResponse>('/auth/register', dto);
-    api.setToken(res.accessToken);
-    setUser(res.user);
-  };
-
-  const logout = () => {
-    api.setToken(null);
-    setUser(null);
+  const logout = async () => {
+    await signOut();
     router.push('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading: isPending, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -21,12 +21,10 @@ import { IconArrowLeft, IconCheck } from '@tabler/icons-react';
 import { MeasurementType, EffortLevel } from '@fitsy/shared';
 import type { ActivityTypeResponse, ActivityLogResponse } from '@fitsy/shared';
 import { api } from '../../../lib/api';
-import { useAuth } from '../../../lib/auth-context';
 import { ActivityCard } from '../../../components/ActivityCard';
 
 export default function LogPage() {
   const router = useRouter();
-  const { refreshUser } = useAuth();
   const [activityTypes, setActivityTypes] = useState<ActivityTypeResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<ActivityTypeResponse | null>(null);
@@ -98,7 +96,6 @@ export default function LogPage() {
 
     try {
       await api.post<ActivityLogResponse>('/activity-logs', body);
-      await refreshUser();
       notifications.show({
         title: 'Activity Logged!',
         message: `You earned ${pointsPreview} points`,

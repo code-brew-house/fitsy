@@ -15,12 +15,10 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconUsers } from '@tabler/icons-react';
 import { api } from '../../../lib/api';
-import { useAuth } from '../../../lib/auth-context';
 import type { FamilyResponse } from '@fitsy/shared';
 
 export default function CreateFamilyPage() {
   const router = useRouter();
-  const { refreshUser } = useAuth();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +29,6 @@ export default function CreateFamilyPage() {
     setLoading(true);
     try {
       await api.post<FamilyResponse>('/family', { name: name.trim() });
-      await refreshUser();
       notifications.show({
         title: 'Family created!',
         message: 'Your family has been created successfully.',

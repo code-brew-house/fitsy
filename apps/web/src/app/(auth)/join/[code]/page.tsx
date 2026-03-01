@@ -13,10 +13,10 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { useAuth } from '../../../../lib/auth-context';
+import { signUp } from '../../../../lib/auth-client';
+import { api } from '../../../../lib/api';
 
 export default function JoinPage() {
-  const { register } = useAuth();
   const router = useRouter();
   const params = useParams<{ code: string }>();
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,13 @@ export default function JoinPage() {
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
     try {
-      await register(values);
+      const result = await signUp.email({ email: values.email, password: values.password, name: values.name });
+      if (result.error) {
+        throw new Error(result.error.message || 'Registration failed');
+      }
+      if (values.inviteCode) {
+        await api.post('/family/join', { inviteCode: values.inviteCode });
+      }
       router.push('/dashboard');
     } catch (err) {
       notifications.show({

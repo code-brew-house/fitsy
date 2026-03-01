@@ -1,31 +1,12 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 class ApiClient {
-  private token: string | null = null;
-
-  setToken(token: string | null) {
-    this.token = token;
-    if (token) {
-      localStorage.setItem('fitsy_token', token);
-    } else {
-      localStorage.removeItem('fitsy_token');
-    }
-  }
-
-  getToken(): string | null {
-    if (!this.token) {
-      this.token = typeof window !== 'undefined' ? localStorage.getItem('fitsy_token') : null;
-    }
-    return this.token;
-  }
-
   async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const token = this.getToken();
     const res = await fetch(`${API_URL}${path}`, {
       ...options,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
       },
     });
