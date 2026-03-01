@@ -33,6 +33,7 @@ import { useAuth } from '../lib/auth-context';
 import { ThemeToggle } from './ThemeToggle';
 import { PointsBadge } from './PointsBadge';
 import { FitsyLogo } from './FitsyLogo';
+import { PwaInstallButton } from './PwaInstallButton';
 
 const mainNav = [
   { label: 'Dashboard', icon: IconDashboard, href: '/dashboard' },
@@ -103,6 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Group>
           </Group>
           <Group gap="sm">
+            <PwaInstallButton />
             <PointsBadge />
             <ThemeToggle />
             <Menu shadow="md" width={200}>
