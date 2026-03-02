@@ -31,10 +31,10 @@ export default function RegisterPage() {
         throw new Error(result.error.message || 'Registration failed');
       }
       if (values.inviteCode) {
-        await api.post('/family/join', { inviteCode: values.inviteCode });
+        await api.post('/club/join', { inviteCode: values.inviteCode });
         router.push('/dashboard');
       } else {
-        router.push('/setup-family');
+        router.push('/setup-club');
       }
     } catch (err) {
       notifications.show({
@@ -59,7 +59,7 @@ export default function RegisterPage() {
           <TextInput label="Name" placeholder="Your name" required {...form.getInputProps('name')} />
           <TextInput label="Email" placeholder="you@example.com" required mt="md" {...form.getInputProps('email')} />
           <PasswordInput label="Password" placeholder="At least 8 characters" required mt="md" {...form.getInputProps('password')} />
-          <TextInput label="Invite code" placeholder="Optional — join an existing family" mt="md" {...form.getInputProps('inviteCode')} />
+          <TextInput label="Invite code" placeholder="Optional — join an existing club" mt="md" {...form.getInputProps('inviteCode')} />
           <Button type="submit" fullWidth mt="xl" loading={loading}>Create account</Button>
         </form>
       </Paper>

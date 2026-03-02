@@ -1,7 +1,7 @@
 {
-  "name": "Fitsy — Family Fitness Tracker",
+  "name": "Fitsy — Fitness Club Tracker",
   "short_name": "Fitsy",
-  "description": "Earn fitness points and redeem rewards with your family",
+  "description": "Earn fitness points and redeem rewards with your club",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#F8F9FC",

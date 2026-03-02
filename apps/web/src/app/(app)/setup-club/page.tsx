@@ -12,7 +12,7 @@ import {
 } from '@mantine/core';
 import { IconUsers, IconUserPlus } from '@tabler/icons-react';
 
-export default function SetupFamilyPage() {
+export default function SetupClubPage() {
   const router = useRouter();
 
   return (
@@ -22,7 +22,7 @@ export default function SetupFamilyPage() {
           Get Started
         </Title>
         <Text c="dimmed" ta="center">
-          Would you like to create a new family or join an existing one?
+          Would you like to create a new club or join an existing one?
         </Text>
 
         <SimpleGrid cols={2} w="100%" spacing="md">
@@ -31,16 +31,16 @@ export default function SetupFamilyPage() {
             radius="md"
             withBorder
             style={{ cursor: 'pointer' }}
-            onClick={() => router.push('/create-family')}
+            onClick={() => router.push('/create-club')}
           >
             <Stack align="center" gap="md">
               <IconUsers size={40} color="var(--mantine-color-indigo-6)" />
-              <Title order={4} ta="center">Create a Family</Title>
+              <Title order={4} ta="center">Create a Club</Title>
               <Text size="sm" c="dimmed" ta="center">
-                Start a new family group and invite members to join.
+                Start a new club group and invite members to join.
               </Text>
-              <Button color="indigo" fullWidth onClick={() => router.push('/create-family')}>
-                Create Family
+              <Button color="indigo" fullWidth onClick={() => router.push('/create-club')}>
+                Create Club
               </Button>
             </Stack>
           </Paper>
@@ -50,16 +50,16 @@ export default function SetupFamilyPage() {
             radius="md"
             withBorder
             style={{ cursor: 'pointer' }}
-            onClick={() => router.push('/join-family')}
+            onClick={() => router.push('/join-club')}
           >
             <Stack align="center" gap="md">
               <IconUserPlus size={40} color="var(--mantine-color-blue-6)" />
-              <Title order={4} ta="center">Join a Family</Title>
+              <Title order={4} ta="center">Join a Club</Title>
               <Text size="sm" c="dimmed" ta="center">
-                Enter an invite code to join an existing family.
+                Enter an invite code to join an existing club.
               </Text>
-              <Button color="blue" fullWidth onClick={() => router.push('/join-family')}>
-                Join Family
+              <Button color="blue" fullWidth onClick={() => router.push('/join-club')}>
+                Join Club
               </Button>
             </Stack>
           </Paper>

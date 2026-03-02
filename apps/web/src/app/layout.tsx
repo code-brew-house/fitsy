@@ -9,8 +9,8 @@ import { AuthProvider } from '../lib/auth-context';
 import { ServiceWorkerRegistration } from '../components/ServiceWorkerRegistration';
 
 export const metadata = {
-  title: 'Fitsy — Family Fitness Tracker',
-  description: 'Earn points for fitness activities and redeem rewards with your family',
+  title: 'Fitsy — Fitness Club Tracker',
+  description: 'Earn points for fitness activities and redeem rewards with your club',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

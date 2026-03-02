@@ -13,32 +13,32 @@ import {
   Anchor,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconUserPlus } from '@tabler/icons-react';
+import { IconUsers } from '@tabler/icons-react';
 import { api } from '../../../lib/api';
-import type { FamilyResponse } from '@fitsy/shared';
+import type { ClubResponse } from '@fitsy/shared';
 
-export default function JoinFamilyPage() {
+export default function CreateClubPage() {
   const router = useRouter();
-  const [inviteCode, setInviteCode] = useState('');
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inviteCode.trim()) return;
+    if (!name.trim()) return;
 
     setLoading(true);
     try {
-      await api.post<FamilyResponse>('/family/join', { inviteCode: inviteCode.trim() });
+      await api.post<ClubResponse>('/club', { name: name.trim() });
       notifications.show({
-        title: 'Joined family!',
-        message: 'You have successfully joined the family.',
+        title: 'Club created!',
+        message: 'Your club has been created successfully.',
         color: 'indigo',
       });
       window.location.href = '/dashboard';
     } catch (err) {
       notifications.show({
         title: 'Error',
-        message: err instanceof Error ? err.message : 'Failed to join family',
+        message: err instanceof Error ? err.message : 'Failed to create club',
         color: 'red',
       });
     } finally {
@@ -49,22 +49,22 @@ export default function JoinFamilyPage() {
   return (
     <Container size="xs" mt="xl">
       <Stack align="center" gap="lg">
-        <IconUserPlus size={48} color="var(--mantine-color-indigo-6)" />
+        <IconUsers size={48} color="var(--mantine-color-indigo-6)" />
         <Title order={2} ta="center">
-          Join a Family
+          Create Your Club
         </Title>
         <Text c="dimmed" ta="center">
-          Enter the invite code shared by your family admin.
+          Start a new club group and invite your members to join.
         </Text>
 
         <Paper w="100%" p="lg" radius="md" withBorder>
           <form onSubmit={handleSubmit}>
             <Stack gap="md">
               <TextInput
-                label="Invite Code"
-                placeholder="e.g. ABC12345"
-                value={inviteCode}
-                onChange={(e) => setInviteCode(e.currentTarget.value)}
+                label="Club Name"
+                placeholder="e.g. Smith Fitness Club"
+                value={name}
+                onChange={(e) => setName(e.currentTarget.value)}
                 required
               />
               <Button
@@ -73,7 +73,7 @@ export default function JoinFamilyPage() {
                 fullWidth
                 loading={loading}
               >
-                Join Family
+                Create Club
               </Button>
             </Stack>
           </form>
@@ -81,8 +81,8 @@ export default function JoinFamilyPage() {
 
         <Text size="sm" c="dimmed">
           Or{' '}
-          <Anchor component="button" type="button" size="sm" onClick={() => router.push('/create-family')}>
-            create a new family
+          <Anchor component="button" type="button" size="sm" onClick={() => router.push('/join-club')}>
+            join an existing club
           </Anchor>
         </Text>
       </Stack>

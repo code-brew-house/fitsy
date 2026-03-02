@@ -62,7 +62,7 @@ export function ProfileView({ userId, isOwnProfile }: ProfileViewProps) {
       .then(setProfile)
       .catch((err) => {
         if ((err as any)?.status === 403) {
-          setError('You can only view profiles of family members');
+          setError('You can only view profiles of club members');
         } else {
           setError('Member not found');
         }

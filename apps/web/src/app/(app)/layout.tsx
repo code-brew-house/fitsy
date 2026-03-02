@@ -6,7 +6,7 @@ import { Center, Loader } from '@mantine/core';
 import { useAuth } from '../../lib/auth-context';
 import { AppShell } from '../../components/AppShell';
 
-const FAMILY_SETUP_PATHS = ['/create-family', '/join-family', '/setup-family'];
+const CLUB_SETUP_PATHS = ['/create-club', '/join-club', '/setup-club'];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -17,8 +17,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (loading) return;
     if (!user) {
       router.push('/login');
-    } else if (!user.familyId && !FAMILY_SETUP_PATHS.includes(pathname)) {
-      router.push('/setup-family');
+    } else if (!user.clubId && !CLUB_SETUP_PATHS.includes(pathname)) {
+      router.push('/setup-club');
     }
   }, [loading, user, pathname, router]);
 

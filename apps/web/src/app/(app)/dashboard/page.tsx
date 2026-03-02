@@ -41,7 +41,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
 
-    if (!user.familyId) {
+    if (!user.clubId) {
       setLoading(false);
       return;
     }
@@ -66,7 +66,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!user?.familyId) {
+  if (!user?.clubId) {
     return (
       <Container size="sm">
         <Stack align="center" gap="lg" mt="xl">
@@ -75,24 +75,24 @@ export default function DashboardPage() {
             Welcome to Fitsy!
           </Title>
           <Text c="dimmed" ta="center" maw={400}>
-            You need to be part of a family to start tracking activities and earning points.
+            You need to be part of a club to start tracking activities and earning points.
           </Text>
           <Group>
             <Button
               variant="filled"
               color="indigo"
               leftSection={<IconPlus size={16} />}
-              onClick={() => router.push('/create-family')}
+              onClick={() => router.push('/create-club')}
             >
-              Create a Family
+              Create a Club
             </Button>
             <Button
               variant="outline"
               color="indigo"
               leftSection={<IconUserPlus size={16} />}
-              onClick={() => router.push('/join-family')}
+              onClick={() => router.push('/join-club')}
             >
-              Join a Family
+              Join a Club
             </Button>
           </Group>
         </Stack>

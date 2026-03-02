@@ -192,14 +192,14 @@ export default function LeaderboardPage() {
           </>
         )}
 
-        <Title order={3} mt="md">Family Activity Feed</Title>
+        <Title order={3} mt="md">Club Activity Feed</Title>
 
         {loadingFeed ? (
           <Center py="md">
             <Loader color="indigo" size="sm" />
           </Center>
         ) : feed.length === 0 ? (
-          <Text c="dimmed">No recent family activity.</Text>
+          <Text c="dimmed">No recent club activity.</Text>
         ) : (
           <AnimatedList>
             <Stack gap="xs">

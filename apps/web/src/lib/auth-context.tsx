@@ -15,7 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // BetterAuth's session.user type only includes base fields.
-// Our server configures additionalFields (role, familyId, totalPoints)
+// Our server configures additionalFields (role, clubId, totalPoints)
 // which are present at runtime but not in the generated TS type.
 interface ExtendedSessionUser {
   id: string;
@@ -24,7 +24,7 @@ interface ExtendedSessionUser {
   image?: string | null;
   createdAt: Date;
   role?: string;
-  familyId?: string | null;
+  clubId?: string | null;
   totalPoints?: number;
 }
 
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: sessionUser.name,
         email: sessionUser.email,
         role: (sessionUser.role === 'ADMIN' ? Role.ADMIN : Role.MEMBER),
-        familyId: sessionUser.familyId ?? null,
+        clubId: sessionUser.clubId ?? null,
         totalPoints: sessionUser.totalPoints ?? 0,
         avatarUrl: sessionUser.image ?? null,
         createdAt: sessionUser.createdAt

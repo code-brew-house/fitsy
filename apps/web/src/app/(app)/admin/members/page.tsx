@@ -22,7 +22,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconCopy, IconCheck, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { Role } from '@fitsy/shared';
-import type { FamilyResponse, UserResponse } from '@fitsy/shared';
+import type { ClubResponse, UserResponse } from '@fitsy/shared';
 import { api } from '../../../../lib/api';
 import { useAuth } from '../../../../lib/auth-context';
 
@@ -33,7 +33,7 @@ interface MemberResponse extends UserResponse {
 export default function AdminMembersPage() {
   const { user: currentUser } = useAuth();
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const [family, setFamily] = useState<FamilyResponse | null>(null);
+  const [family, setFamily] = useState<ClubResponse | null>(null);
   const [members, setMembers] = useState<MemberResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
@@ -41,13 +41,13 @@ export default function AdminMembersPage() {
   const fetchData = useCallback(async () => {
     try {
       const [familyData, membersData] = await Promise.all([
-        api.get<FamilyResponse>('/family'),
-        api.get<MemberResponse[]>('/family/members'),
+        api.get<ClubResponse>('/club'),
+        api.get<MemberResponse[]>('/club/members'),
       ]);
       setFamily(familyData);
       setMembers(membersData);
     } catch {
-      notifications.show({ title: 'Error', message: 'Failed to load family data', color: 'red' });
+      notifications.show({ title: 'Error', message: 'Failed to load club data', color: 'red' });
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export default function AdminMembersPage() {
     if (!window.confirm('Regenerate invite code? The old code will stop working.')) return;
     setRegenerating(true);
     try {
-      const data = await api.post<FamilyResponse>('/family/regenerate-code', {});
+      const data = await api.post<ClubResponse>('/club/regenerate-code', {});
       setFamily(data);
       notifications.show({ title: 'Success', message: 'Invite code regenerated', color: 'indigo' });
     } catch (err) {
@@ -76,9 +76,9 @@ export default function AdminMembersPage() {
   };
 
   const handleRemoveMember = async (memberId: string, memberName: string) => {
-    if (!window.confirm(`Remove "${memberName}" from the family?`)) return;
+    if (!window.confirm(`Remove "${memberName}" from the club?`)) return;
     try {
-      await api.delete(`/family/members/${memberId}`);
+      await api.delete(`/club/members/${memberId}`);
       notifications.show({ title: 'Removed', message: `${memberName} has been removed`, color: 'indigo' });
       await fetchData();
     } catch (err) {
@@ -101,7 +101,7 @@ export default function AdminMembersPage() {
   return (
     <Container size="lg">
       <Stack gap="md">
-        <Title order={2}>Family Members</Title>
+        <Title order={2}>Club Members</Title>
 
         {family && (
           <Paper p="md" radius="md" withBorder>

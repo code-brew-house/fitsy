@@ -43,7 +43,7 @@ export default function JoinPage() {
         throw new Error(result.error.message || 'Registration failed');
       }
       if (values.inviteCode) {
-        await api.post('/family/join', { inviteCode: values.inviteCode });
+        await api.post('/club/join', { inviteCode: values.inviteCode });
       }
       router.push('/dashboard');
     } catch (err) {
@@ -60,7 +60,7 @@ export default function JoinPage() {
   return (
     <>
       <Title ta="center" mb={4}>
-        Join a family
+        Join a club
       </Title>
       <Text c="dimmed" size="sm" ta="center" mb="lg">
         Already have an account?{' '}
