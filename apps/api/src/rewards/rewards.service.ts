@@ -6,29 +6,29 @@ import { CreateRewardDto, UpdateRewardDto } from '@fitsy/shared';
 export class RewardsService {
   constructor(private prisma: PrismaService) {}
 
-  private async getUserFamilyId(userId: string): Promise<string> {
+  private async getUserClubId(userId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { familyId: true },
+      select: { clubId: true },
     });
-    if (!user || !user.familyId) {
-      throw new ForbiddenException('User is not part of a family');
+    if (!user || !user.clubId) {
+      throw new ForbiddenException('User is not part of a club');
     }
-    return user.familyId;
+    return user.clubId;
   }
 
-  async findAll(familyId: string, includeInactive: boolean = false) {
-    const where: any = { familyId };
+  async findAll(clubId: string, includeInactive: boolean = false) {
+    const where: any = { clubId };
     if (!includeInactive) {
       where.isActive = true;
     }
     return this.prisma.reward.findMany({ where, orderBy: { createdAt: 'desc' } });
   }
 
-  async create(familyId: string, dto: CreateRewardDto) {
+  async create(clubId: string, dto: CreateRewardDto) {
     return this.prisma.reward.create({
       data: {
-        familyId,
+        clubId,
         name: dto.name,
         description: dto.description,
         imageUrl: dto.imageUrl,
@@ -38,9 +38,9 @@ export class RewardsService {
     });
   }
 
-  async update(familyId: string, id: string, dto: UpdateRewardDto) {
+  async update(clubId: string, id: string, dto: UpdateRewardDto) {
     const reward = await this.prisma.reward.findUnique({ where: { id } });
-    if (!reward || reward.familyId !== familyId) {
+    if (!reward || reward.clubId !== clubId) {
       throw new NotFoundException('Reward not found');
     }
     return this.prisma.reward.update({
@@ -49,9 +49,9 @@ export class RewardsService {
     });
   }
 
-  async remove(familyId: string, id: string) {
+  async remove(clubId: string, id: string) {
     const reward = await this.prisma.reward.findUnique({ where: { id } });
-    if (!reward || reward.familyId !== familyId) {
+    if (!reward || reward.clubId !== clubId) {
       throw new NotFoundException('Reward not found');
     }
     return this.prisma.reward.update({
@@ -60,7 +60,7 @@ export class RewardsService {
     });
   }
 
-  async getFamilyIdForUser(userId: string): Promise<string> {
-    return this.getUserFamilyId(userId);
+  async getClubIdForUser(userId: string): Promise<string> {
+    return this.getUserClubId(userId);
   }
 }

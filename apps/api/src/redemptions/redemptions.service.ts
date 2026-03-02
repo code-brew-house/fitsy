@@ -11,22 +11,22 @@ import { CreateRedemptionDto } from '@fitsy/shared';
 export class RedemptionsService {
   constructor(private prisma: PrismaService) {}
 
-  private async getUserFamilyId(userId: string): Promise<string> {
+  private async getUserClubId(userId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { familyId: true },
+      select: { clubId: true },
     });
-    if (!user || !user.familyId) {
-      throw new ForbiddenException('User is not part of a family');
+    if (!user || !user.clubId) {
+      throw new ForbiddenException('User is not part of a club');
     }
-    return user.familyId;
+    return user.clubId;
   }
 
   async create(userId: string, dto: CreateRedemptionDto) {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
         where: { id: userId },
-        select: { id: true, totalPoints: true, familyId: true },
+        select: { id: true, totalPoints: true, clubId: true },
       });
       if (!user) throw new NotFoundException('User not found');
 
@@ -34,7 +34,7 @@ export class RedemptionsService {
         where: { id: dto.rewardId },
       });
       if (!reward || !reward.isActive) throw new NotFoundException('Reward not found');
-      if (reward.familyId !== user.familyId) throw new NotFoundException('Reward not found');
+      if (reward.clubId !== user.clubId) throw new NotFoundException('Reward not found');
       if (user.totalPoints < reward.pointCost) throw new BadRequestException('Insufficient points');
       if (reward.quantity !== null && reward.quantity <= 0) throw new BadRequestException('Reward out of stock');
 
@@ -99,10 +99,10 @@ export class RedemptionsService {
     }));
   }
 
-  async findAll(familyId: string) {
+  async findAll(clubId: string) {
     const redemptions = await this.prisma.redemption.findMany({
       where: {
-        reward: { familyId },
+        reward: { clubId },
       },
       include: {
         user: { select: { name: true } },
@@ -122,12 +122,12 @@ export class RedemptionsService {
     }));
   }
 
-  async fulfill(familyId: string, redemptionId: string) {
+  async fulfill(clubId: string, redemptionId: string) {
     const redemption = await this.prisma.redemption.findUnique({
       where: { id: redemptionId },
-      include: { reward: { select: { familyId: true } } },
+      include: { reward: { select: { clubId: true } } },
     });
-    if (!redemption || redemption.reward.familyId !== familyId) {
+    if (!redemption || redemption.reward.clubId !== clubId) {
       throw new NotFoundException('Redemption not found');
     }
     if (redemption.status !== 'PENDING') {
@@ -140,12 +140,12 @@ export class RedemptionsService {
     });
   }
 
-  async cancel(familyId: string, redemptionId: string) {
+  async cancel(clubId: string, redemptionId: string) {
     const redemption = await this.prisma.redemption.findUnique({
       where: { id: redemptionId },
-      include: { reward: { select: { familyId: true } } },
+      include: { reward: { select: { clubId: true } } },
     });
-    if (!redemption || redemption.reward.familyId !== familyId) {
+    if (!redemption || redemption.reward.clubId !== clubId) {
       throw new NotFoundException('Redemption not found');
     }
     if (redemption.status !== 'PENDING') {
@@ -167,7 +167,7 @@ export class RedemptionsService {
     });
   }
 
-  async getFamilyIdForUser(userId: string): Promise<string> {
-    return this.getUserFamilyId(userId);
+  async getClubIdForUser(userId: string): Promise<string> {
+    return this.getUserClubId(userId);
   }
 }

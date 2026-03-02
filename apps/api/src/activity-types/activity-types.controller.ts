@@ -11,7 +11,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { ActivityTypesService } from './activity-types.service';
-import { FamilyService } from '../family/family.service';
+import { ClubService } from '../club/club.service';
 import { BetterAuthGuard } from '../auth/better-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -23,7 +23,7 @@ import { ZodValidationPipe } from '../common/zod-validation.pipe';
 export class ActivityTypesController {
   constructor(
     private activityTypesService: ActivityTypesService,
-    private familyService: FamilyService,
+    private clubService: ClubService,
   ) {}
 
   @Get()
@@ -31,8 +31,8 @@ export class ActivityTypesController {
     @Request() req: any,
     @Query('includeInactive') includeInactive?: string,
   ) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.id);
-    return this.activityTypesService.findAll(familyId, includeInactive === 'true');
+    const clubId = await this.clubService.getUserClubId(req.user.id);
+    return this.activityTypesService.findAll(clubId, includeInactive === 'true');
   }
 
   @Post()
@@ -42,8 +42,8 @@ export class ActivityTypesController {
     @Request() req: any,
     @Body(new ZodValidationPipe(createActivityTypeSchema)) body: any,
   ) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.id);
-    return this.activityTypesService.create(familyId, body);
+    const clubId = await this.clubService.getUserClubId(req.user.id);
+    return this.activityTypesService.create(clubId, body);
   }
 
   @Patch(':id')
@@ -54,15 +54,15 @@ export class ActivityTypesController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateActivityTypeSchema)) body: any,
   ) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.id);
-    return this.activityTypesService.update(familyId, id, body);
+    const clubId = await this.clubService.getUserClubId(req.user.id);
+    return this.activityTypesService.update(clubId, id, body);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async remove(@Request() req: any, @Param('id') id: string) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.id);
-    return this.activityTypesService.remove(familyId, id);
+    const clubId = await this.clubService.getUserClubId(req.user.id);
+    return this.activityTypesService.remove(clubId, id);
   }
 }

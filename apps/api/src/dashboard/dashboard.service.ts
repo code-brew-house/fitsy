@@ -9,7 +9,7 @@ export class DashboardService {
   async getDashboard(userId: string): Promise<DashboardResponse> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { totalPoints: true, familyId: true },
+      select: { totalPoints: true, clubId: true },
     });
     if (!user) {
       throw new ForbiddenException('User not found');

@@ -6,25 +6,25 @@ import { LeaderboardEntry } from '@fitsy/shared';
 export class LeaderboardService {
   constructor(private prisma: PrismaService) {}
 
-  async getUserFamilyId(userId: string): Promise<string> {
+  async getUserClubId(userId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { familyId: true },
+      select: { clubId: true },
     });
-    if (!user || !user.familyId) {
-      throw new ForbiddenException('User is not part of a family');
+    if (!user || !user.clubId) {
+      throw new ForbiddenException('User is not part of a club');
     }
-    return user.familyId;
+    return user.clubId;
   }
 
   async getRankings(
-    familyId: string,
+    clubId: string,
     period: 'week' | 'month' | 'alltime',
   ): Promise<LeaderboardEntry[]> {
     // For all-time, use pre-computed totalPoints on User (no aggregation needed)
     if (period === 'alltime') {
       const members = await this.prisma.user.findMany({
-        where: { familyId },
+        where: { clubId },
         select: { id: true, name: true, image: true, totalPoints: true },
         orderBy: { totalPoints: 'desc' },
       });
@@ -44,7 +44,7 @@ export class LeaderboardService {
         : new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const familyMembers = await this.prisma.user.findMany({
-      where: { familyId },
+      where: { clubId },
       select: { id: true, name: true, image: true },
     });
 

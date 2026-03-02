@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateFamilyDto, JoinFamilyDto, UpdateFamilyDto } from '@fitsy/shared';
+import { CreateClubDto, JoinClubDto, UpdateClubDto } from '@fitsy/shared';
 
 const DEFAULT_ACTIVITIES = [
   { name: 'Running', icon: '\u{1F3C3}', measurementType: 'DISTANCE' as const, pointsPerUnit: 1, unit: 'km' },
@@ -22,17 +22,17 @@ function generateInviteCode(): string {
 }
 
 @Injectable()
-export class FamilyService {
+export class ClubService {
   constructor(private prisma: PrismaService) {}
 
-  async createFamily(userId: string, dto: CreateFamilyDto) {
+  async createClub(userId: string, dto: CreateClubDto) {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({ where: { id: userId } });
-      if (user?.familyId) {
-        throw new ConflictException('User already belongs to a family');
+      if (user?.clubId) {
+        throw new ConflictException('User already belongs to a club');
       }
 
-      const family = await tx.family.create({
+      const club = await tx.club.create({
         data: {
           name: dto.name,
           inviteCode: generateInviteCode(),
@@ -41,68 +41,68 @@ export class FamilyService {
 
       await tx.user.update({
         where: { id: userId },
-        data: { familyId: family.id, role: 'ADMIN' },
+        data: { clubId: club.id, role: 'ADMIN' },
       });
 
       await tx.activityType.createMany({
         data: DEFAULT_ACTIVITIES.map((activity) => ({
           ...activity,
-          familyId: family.id,
+          clubId: club.id,
         })),
       });
 
-      return family;
+      return club;
     });
   }
 
-  async joinFamily(userId: string, dto: JoinFamilyDto) {
+  async joinClub(userId: string, dto: JoinClubDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (user?.familyId) {
-      throw new ConflictException('User already belongs to a family');
+    if (user?.clubId) {
+      throw new ConflictException('User already belongs to a club');
     }
 
-    const family = await this.prisma.family.findFirst({
+    const club = await this.prisma.club.findFirst({
       where: { inviteCode: dto.inviteCode },
     });
-    if (!family) {
+    if (!club) {
       throw new NotFoundException('Invalid invite code');
     }
 
     await this.prisma.user.update({
       where: { id: userId },
-      data: { familyId: family.id },
+      data: { clubId: club.id },
     });
 
-    return family;
+    return club;
   }
 
-  async getFamily(familyId: string) {
-    const family = await this.prisma.family.findUnique({
-      where: { id: familyId },
+  async getClub(clubId: string) {
+    const club = await this.prisma.club.findUnique({
+      where: { id: clubId },
     });
-    if (!family) {
-      throw new NotFoundException('Family not found');
+    if (!club) {
+      throw new NotFoundException('Club not found');
     }
-    return family;
+    return club;
   }
 
-  async updateFamily(familyId: string, dto: UpdateFamilyDto) {
-    return this.prisma.family.update({
-      where: { id: familyId },
+  async updateClub(clubId: string, dto: UpdateClubDto) {
+    return this.prisma.club.update({
+      where: { id: clubId },
       data: { name: dto.name },
     });
   }
 
-  async regenerateInviteCode(familyId: string) {
-    return this.prisma.family.update({
-      where: { id: familyId },
+  async regenerateInviteCode(clubId: string) {
+    return this.prisma.club.update({
+      where: { id: clubId },
       data: { inviteCode: generateInviteCode() },
     });
   }
 
-  async getMembers(familyId: string) {
+  async getMembers(clubId: string) {
     return this.prisma.user.findMany({
-      where: { familyId },
+      where: { clubId },
       select: {
         id: true,
         name: true,
@@ -115,31 +115,31 @@ export class FamilyService {
     });
   }
 
-  async removeMember(familyId: string, memberId: string, requesterId: string) {
+  async removeMember(clubId: string, memberId: string, requesterId: string) {
     if (memberId === requesterId) {
-      throw new BadRequestException('Cannot remove yourself from the family');
+      throw new BadRequestException('Cannot remove yourself from the club');
     }
 
     const member = await this.prisma.user.findUnique({
       where: { id: memberId },
     });
-    if (!member || member.familyId !== familyId) {
-      throw new NotFoundException('Member not found in this family');
+    if (!member || member.clubId !== clubId) {
+      throw new NotFoundException('Member not found in this club');
     }
 
     await this.prisma.user.update({
       where: { id: memberId },
-      data: { familyId: null, role: 'MEMBER' },
+      data: { clubId: null, role: 'MEMBER' },
     });
   }
 
-  async getUserFamilyId(userId: string): Promise<string> {
+  async getUserClubId(userId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
-    if (!user?.familyId) {
-      throw new NotFoundException('User does not belong to a family');
+    if (!user?.clubId) {
+      throw new NotFoundException('User does not belong to a club');
     }
-    return user.familyId;
+    return user.clubId;
   }
 }

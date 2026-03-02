@@ -37,29 +37,29 @@ export class RedemptionsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async findAll(@Request() req: any) {
-    const familyId = await this.redemptionsService.getFamilyIdForUser(
+    const clubId = await this.redemptionsService.getClubIdForUser(
       req.user.id,
     );
-    return this.redemptionsService.findAll(familyId);
+    return this.redemptionsService.findAll(clubId);
   }
 
   @Patch(':id/fulfill')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async fulfill(@Request() req: any, @Param('id') id: string) {
-    const familyId = await this.redemptionsService.getFamilyIdForUser(
+    const clubId = await this.redemptionsService.getClubIdForUser(
       req.user.id,
     );
-    return this.redemptionsService.fulfill(familyId, id);
+    return this.redemptionsService.fulfill(clubId, id);
   }
 
   @Patch(':id/cancel')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async cancel(@Request() req: any, @Param('id') id: string) {
-    const familyId = await this.redemptionsService.getFamilyIdForUser(
+    const clubId = await this.redemptionsService.getClubIdForUser(
       req.user.id,
     );
-    return this.redemptionsService.cancel(familyId, id);
+    return this.redemptionsService.cancel(clubId, id);
   }
 }

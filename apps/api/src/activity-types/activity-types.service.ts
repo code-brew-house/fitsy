@@ -6,25 +6,25 @@ import { CreateActivityTypeDto, UpdateActivityTypeDto } from '@fitsy/shared';
 export class ActivityTypesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(familyId: string, includeInactive: boolean = false) {
-    const where: any = { familyId };
+  async findAll(clubId: string, includeInactive: boolean = false) {
+    const where: any = { clubId };
     if (!includeInactive) {
       where.isActive = true;
     }
     return this.prisma.activityType.findMany({ where, orderBy: { createdAt: 'asc' } });
   }
 
-  async create(familyId: string, dto: CreateActivityTypeDto) {
+  async create(clubId: string, dto: CreateActivityTypeDto) {
     return this.prisma.activityType.create({
-      data: { ...dto, familyId },
+      data: { ...dto, clubId },
     });
   }
 
-  async update(familyId: string, id: string, dto: UpdateActivityTypeDto) {
+  async update(clubId: string, id: string, dto: UpdateActivityTypeDto) {
     const activityType = await this.prisma.activityType.findUnique({
       where: { id },
     });
-    if (!activityType || activityType.familyId !== familyId) {
+    if (!activityType || activityType.clubId !== clubId) {
       throw new NotFoundException('Activity type not found');
     }
 
@@ -34,11 +34,11 @@ export class ActivityTypesService {
     });
   }
 
-  async remove(familyId: string, id: string) {
+  async remove(clubId: string, id: string) {
     const activityType = await this.prisma.activityType.findUnique({
       where: { id },
     });
-    if (!activityType || activityType.familyId !== familyId) {
+    if (!activityType || activityType.clubId !== clubId) {
       throw new NotFoundException('Activity type not found');
     }
 

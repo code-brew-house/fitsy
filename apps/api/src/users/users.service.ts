@@ -11,19 +11,19 @@ export class UsersService {
     const [requester, target] = await Promise.all([
       this.prisma.user.findUnique({
         where: { id: requestingUserId },
-        select: { familyId: true },
+        select: { clubId: true },
       }),
       this.prisma.user.findUnique({
         where: { id: targetUserId },
-        select: { id: true, name: true, image: true, role: true, totalPoints: true, familyId: true, createdAt: true },
+        select: { id: true, name: true, image: true, role: true, totalPoints: true, clubId: true, createdAt: true },
       }),
     ]);
 
     if (!target) {
       throw new NotFoundException('User not found');
     }
-    if (!requester?.familyId || !target.familyId || requester.familyId !== target.familyId) {
-      throw new ForbiddenException('You can only view profiles of family members');
+    if (!requester?.clubId || !target.clubId || requester.clubId !== target.clubId) {
+      throw new ForbiddenException('You can only view profiles of club members');
     }
 
     // Get activity count

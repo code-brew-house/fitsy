@@ -89,16 +89,16 @@ export class CommentsService {
   private async verifyFamilyAccess(activityLogId: string, userId: string) {
     const log = await this.prisma.activityLog.findUnique({
       where: { id: activityLogId },
-      include: { user: { select: { familyId: true } } },
+      include: { user: { select: { clubId: true } } },
     });
     if (!log) throw new NotFoundException('Activity log not found');
 
     const requester = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { familyId: true },
+      select: { clubId: true },
     });
-    if (!requester || requester.familyId !== log.user.familyId) {
-      throw new ForbiddenException('Not in the same family');
+    if (!requester || requester.clubId !== log.user.clubId) {
+      throw new ForbiddenException('Not in the same club');
     }
   }
 }

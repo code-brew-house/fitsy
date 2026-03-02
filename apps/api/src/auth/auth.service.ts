@@ -8,7 +8,7 @@ export class AuthService {
   async getMe(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { family: true },
+      include: { club: true },
     });
     if (!user) {
       throw new UnauthorizedException();
@@ -19,15 +19,15 @@ export class AuthService {
       name: user.name,
       avatarUrl: user.image,
       role: user.role,
-      familyId: user.familyId,
+      clubId: user.clubId,
       totalPoints: user.totalPoints,
       createdAt: user.createdAt.toISOString(),
-      family: user.family
+      club: user.club
         ? {
-            id: user.family.id,
-            name: user.family.name,
-            inviteCode: user.family.inviteCode,
-            createdAt: user.family.createdAt.toISOString(),
+            id: user.club.id,
+            name: user.club.name,
+            inviteCode: user.club.inviteCode,
+            createdAt: user.club.createdAt.toISOString(),
           }
         : null,
     };

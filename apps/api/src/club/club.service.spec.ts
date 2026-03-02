@@ -4,11 +4,11 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { FamilyService } from './family.service';
+import { ClubService } from './club.service';
 import { PrismaService } from '../prisma/prisma.service';
 
-describe('FamilyService', () => {
-  let service: FamilyService;
+describe('ClubService', () => {
+  let service: ClubService;
   let prisma: any;
 
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe('FamilyService', () => {
         update: jest.fn(),
         findMany: jest.fn(),
       },
-      family: {
+      club: {
         create: jest.fn(),
         findUnique: jest.fn(),
         findFirst: jest.fn(),
@@ -32,136 +32,136 @@ describe('FamilyService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        FamilyService,
+        ClubService,
         { provide: PrismaService, useValue: prisma },
       ],
     }).compile();
 
-    service = module.get<FamilyService>(FamilyService);
+    service = module.get<ClubService>(ClubService);
   });
 
-  describe('createFamily', () => {
-    it('should create a family, promote user to admin, and seed activities', async () => {
-      const mockFamily = {
-        id: 'family-1',
-        name: 'Test Family',
+  describe('createClub', () => {
+    it('should create a club, promote user to admin, and seed activities', async () => {
+      const mockClub = {
+        id: 'club-1',
+        name: 'Test Club',
         inviteCode: 'ABCD1234',
         createdAt: new Date(),
       };
 
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-1',
-        familyId: null,
+        clubId: null,
       });
-      prisma.family.create.mockResolvedValue(mockFamily);
+      prisma.club.create.mockResolvedValue(mockClub);
       prisma.user.update.mockResolvedValue({
         id: 'user-1',
         role: 'ADMIN',
-        familyId: 'family-1',
+        clubId: 'club-1',
       });
       prisma.activityType.createMany.mockResolvedValue({ count: 6 });
 
-      const result = await service.createFamily('user-1', { name: 'Test Family' });
+      const result = await service.createClub('user-1', { name: 'Test Club' });
 
-      expect(result).toEqual(mockFamily);
-      expect(prisma.family.create).toHaveBeenCalledWith({
+      expect(result).toEqual(mockClub);
+      expect(prisma.club.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          name: 'Test Family',
+          name: 'Test Club',
           inviteCode: expect.any(String),
         }),
       });
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        data: { familyId: 'family-1', role: 'ADMIN' },
+        data: { clubId: 'club-1', role: 'ADMIN' },
       });
       expect(prisma.activityType.createMany).toHaveBeenCalledWith({
         data: expect.arrayContaining([
-          expect.objectContaining({ name: 'Running', familyId: 'family-1' }),
+          expect.objectContaining({ name: 'Running', clubId: 'club-1' }),
         ]),
       });
     });
 
-    it('should throw ConflictException if user already has a family', async () => {
+    it('should throw ConflictException if user already has a club', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-1',
-        familyId: 'existing-family',
+        clubId: 'existing-club',
       });
 
       await expect(
-        service.createFamily('user-1', { name: 'New Family' }),
+        service.createClub('user-1', { name: 'New Club' }),
       ).rejects.toThrow(ConflictException);
     });
   });
 
-  describe('joinFamily', () => {
-    it('should join a family by invite code', async () => {
+  describe('joinClub', () => {
+    it('should join a club by invite code', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-2',
-        familyId: null,
+        clubId: null,
       });
-      prisma.family.findFirst.mockResolvedValue({
-        id: 'family-1',
-        name: 'Test Family',
+      prisma.club.findFirst.mockResolvedValue({
+        id: 'club-1',
+        name: 'Test Club',
         inviteCode: 'ABCD1234',
       });
       prisma.user.update.mockResolvedValue({
         id: 'user-2',
-        familyId: 'family-1',
+        clubId: 'club-1',
         role: 'MEMBER',
       });
 
-      const result = await service.joinFamily('user-2', { inviteCode: 'ABCD1234' });
+      const result = await service.joinClub('user-2', { inviteCode: 'ABCD1234' });
 
-      expect(result.id).toBe('family-1');
+      expect(result.id).toBe('club-1');
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-2' },
-        data: { familyId: 'family-1' },
+        data: { clubId: 'club-1' },
       });
     });
 
-    it('should throw ConflictException if user already in a family', async () => {
+    it('should throw ConflictException if user already in a club', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-2',
-        familyId: 'existing-family',
+        clubId: 'existing-club',
       });
 
       await expect(
-        service.joinFamily('user-2', { inviteCode: 'ABCD1234' }),
+        service.joinClub('user-2', { inviteCode: 'ABCD1234' }),
       ).rejects.toThrow(ConflictException);
     });
 
     it('should throw NotFoundException if invite code is invalid', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-2',
-        familyId: null,
+        clubId: null,
       });
-      prisma.family.findFirst.mockResolvedValue(null);
+      prisma.club.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.joinFamily('user-2', { inviteCode: 'INVALID' }),
+        service.joinClub('user-2', { inviteCode: 'INVALID' }),
       ).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('getMembers', () => {
-    it('should return all members of a family', async () => {
+    it('should return all members of a club', async () => {
       const members = [
-        { id: 'user-1', name: 'Alice', email: 'a@test.com', role: 'ADMIN', avatarUrl: null, totalPoints: 100, createdAt: new Date() },
-        { id: 'user-2', name: 'Bob', email: 'b@test.com', role: 'MEMBER', avatarUrl: null, totalPoints: 50, createdAt: new Date() },
+        { id: 'user-1', name: 'Alice', email: 'a@test.com', role: 'ADMIN', image: null, totalPoints: 100, createdAt: new Date() },
+        { id: 'user-2', name: 'Bob', email: 'b@test.com', role: 'MEMBER', image: null, totalPoints: 50, createdAt: new Date() },
       ];
       prisma.user.findMany.mockResolvedValue(members);
 
-      const result = await service.getMembers('family-1');
+      const result = await service.getMembers('club-1');
 
       expect(result).toEqual(members);
       expect(prisma.user.findMany).toHaveBeenCalledWith({
-        where: { familyId: 'family-1' },
+        where: { clubId: 'club-1' },
         select: {
           id: true,
           name: true,
           email: true,
           role: true,
-          avatarUrl: true,
+          image: true,
           totalPoints: true,
           createdAt: true,
         },
@@ -172,61 +172,61 @@ describe('FamilyService', () => {
   describe('removeMember', () => {
     it('should throw BadRequestException if trying to remove self', async () => {
       await expect(
-        service.removeMember('family-1', 'user-1', 'user-1'),
+        service.removeMember('club-1', 'user-1', 'user-1'),
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw NotFoundException if member not in family', async () => {
+    it('should throw NotFoundException if member not in club', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-2',
-        familyId: 'other-family',
+        clubId: 'other-club',
       });
 
       await expect(
-        service.removeMember('family-1', 'user-2', 'user-1'),
+        service.removeMember('club-1', 'user-2', 'user-1'),
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should remove member from family', async () => {
+    it('should remove member from club', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-2',
-        familyId: 'family-1',
+        clubId: 'club-1',
       });
       prisma.user.update.mockResolvedValue({
         id: 'user-2',
-        familyId: null,
+        clubId: null,
         role: 'MEMBER',
       });
 
-      await service.removeMember('family-1', 'user-2', 'user-1');
+      await service.removeMember('club-1', 'user-2', 'user-1');
 
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-2' },
-        data: { familyId: null, role: 'MEMBER' },
+        data: { clubId: null, role: 'MEMBER' },
       });
     });
   });
 
-  describe('getUserFamilyId', () => {
-    it('should throw NotFoundException if user has no family', async () => {
+  describe('getUserClubId', () => {
+    it('should throw NotFoundException if user has no club', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-1',
-        familyId: null,
+        clubId: null,
       });
 
       await expect(
-        service.getUserFamilyId('user-1'),
+        service.getUserClubId('user-1'),
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should return familyId if user has one', async () => {
+    it('should return clubId if user has one', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-1',
-        familyId: 'family-1',
+        clubId: 'club-1',
       });
 
-      const result = await service.getUserFamilyId('user-1');
-      expect(result).toBe('family-1');
+      const result = await service.getUserClubId('user-1');
+      expect(result).toBe('club-1');
     });
   });
 });

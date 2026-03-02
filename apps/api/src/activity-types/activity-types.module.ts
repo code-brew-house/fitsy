@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ActivityTypesService } from './activity-types.service';
 import { ActivityTypesController } from './activity-types.controller';
-import { FamilyModule } from '../family/family.module';
+import { ClubModule } from '../club/club.module';
 
 @Module({
-  imports: [FamilyModule],
+  imports: [ClubModule],
   controllers: [ActivityTypesController],
   providers: [ActivityTypesService],
   exports: [ActivityTypesService],

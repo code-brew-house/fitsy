@@ -13,7 +13,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { ActivityLogsService } from './activity-logs.service';
-import { FamilyService } from '../family/family.service';
+import { ClubService } from '../club/club.service';
 import { BetterAuthGuard } from '../auth/better-auth.guard';
 import { createActivityLogSchema, updateActivityLogSchema } from '@fitsy/shared';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
@@ -23,7 +23,7 @@ import { ZodValidationPipe } from '../common/zod-validation.pipe';
 export class ActivityLogsController {
   constructor(
     private activityLogsService: ActivityLogsService,
-    private familyService: FamilyService,
+    private clubService: ClubService,
   ) {}
 
   @Post()
@@ -43,10 +43,10 @@ export class ActivityLogsController {
     @Query('userId') userId?: string,
   ) {
     if (userId) {
-      const requesterFamilyId = await this.familyService.getUserFamilyId(req.user.id);
-      const targetFamilyId = await this.familyService.getUserFamilyId(userId);
-      if (requesterFamilyId !== targetFamilyId) {
-        throw new ForbiddenException('You can only view activities of family members');
+      const requesterClubId = await this.clubService.getUserClubId(req.user.id);
+      const targetClubId = await this.clubService.getUserClubId(userId);
+      if (requesterClubId !== targetClubId) {
+        throw new ForbiddenException('You can only view activities of club members');
       }
     }
     return this.activityLogsService.findOwn(
@@ -62,8 +62,8 @@ export class ActivityLogsController {
     @Request() req: any,
     @Query('limit') limit?: string,
   ) {
-    const familyId = await this.familyService.getUserFamilyId(req.user.id);
-    return this.activityLogsService.findFeed(familyId, req.user.id, parseInt(limit ?? '20', 10));
+    const clubId = await this.clubService.getUserClubId(req.user.id);
+    return this.activityLogsService.findFeed(clubId, req.user.id, parseInt(limit ?? '20', 10));
   }
 
   @Patch(':id')

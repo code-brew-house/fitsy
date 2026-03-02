@@ -27,8 +27,8 @@ export class RewardsController {
     @Request() req: any,
     @Query('includeInactive') includeInactive?: string,
   ) {
-    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.id);
-    return this.rewardsService.findAll(familyId, includeInactive === 'true');
+    const clubId = await this.rewardsService.getClubIdForUser(req.user.id);
+    return this.rewardsService.findAll(clubId, includeInactive === 'true');
   }
 
   @Post()
@@ -38,8 +38,8 @@ export class RewardsController {
     @Request() req: any,
     @Body(new ZodValidationPipe(createRewardSchema)) body: any,
   ) {
-    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.id);
-    return this.rewardsService.create(familyId, body);
+    const clubId = await this.rewardsService.getClubIdForUser(req.user.id);
+    return this.rewardsService.create(clubId, body);
   }
 
   @Patch(':id')
@@ -50,15 +50,15 @@ export class RewardsController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateRewardSchema)) body: any,
   ) {
-    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.id);
-    return this.rewardsService.update(familyId, id, body);
+    const clubId = await this.rewardsService.getClubIdForUser(req.user.id);
+    return this.rewardsService.update(clubId, id, body);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async remove(@Request() req: any, @Param('id') id: string) {
-    const familyId = await this.rewardsService.getFamilyIdForUser(req.user.id);
-    return this.rewardsService.remove(familyId, id);
+    const clubId = await this.rewardsService.getClubIdForUser(req.user.id);
+    return this.rewardsService.remove(clubId, id);
   }
 }

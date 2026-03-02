@@ -20,9 +20,9 @@ export class ActivityLogsService {
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { familyId: true },
+      select: { clubId: true },
     });
-    if (!user || user.familyId !== activityType.familyId) {
+    if (!user || user.clubId !== activityType.clubId) {
       throw new NotFoundException('Activity type not found');
     }
 
@@ -118,9 +118,9 @@ export class ActivityLogsService {
     };
   }
 
-  async findFeed(familyId: string, userId: string, limit: number = 20) {
+  async findFeed(clubId: string, userId: string, limit: number = 20) {
     const logs = await this.prisma.activityLog.findMany({
-      where: { user: { familyId } },
+      where: { user: { clubId } },
       include: {
         activityType: { select: { name: true, icon: true } },
         user: { select: { name: true } },

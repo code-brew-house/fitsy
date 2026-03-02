@@ -17,9 +17,9 @@ export class LeaderboardController {
       ? (period as 'week' | 'month' | 'alltime')
       : 'week';
 
-    const familyId = await this.leaderboardService.getUserFamilyId(
+    const clubId = await this.leaderboardService.getUserClubId(
       req.user.id,
     );
-    return this.leaderboardService.getRankings(familyId, selectedPeriod);
+    return this.leaderboardService.getRankings(clubId, selectedPeriod);
   }
 }
