@@ -146,7 +146,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Group>
       </MantineAppShell.Header>
 
-      <MantineAppShell.Navbar p="sm">
+      <MantineAppShell.Navbar p="sm" style={{ paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px))' }}>
         <Stack gap={4}>
           {mainNav.map((item) => (
             <NavLink
