@@ -11,7 +11,7 @@ export class CommentsService {
   constructor(private prisma: PrismaService) {}
 
   async findByActivityLog(activityLogId: string, requesterId: string) {
-    await this.verifyFamilyAccess(activityLogId, requesterId);
+    await this.verifyClubAccess(activityLogId, requesterId);
 
     const comments = await this.prisma.comment.findMany({
       where: { activityLogId },
@@ -30,7 +30,7 @@ export class CommentsService {
   }
 
   async create(activityLogId: string, userId: string, dto: CreateCommentDto) {
-    await this.verifyFamilyAccess(activityLogId, userId);
+    await this.verifyClubAccess(activityLogId, userId);
 
     const comment = await this.prisma.comment.create({
       data: {
@@ -86,7 +86,7 @@ export class CommentsService {
     await this.prisma.comment.delete({ where: { id: commentId } });
   }
 
-  private async verifyFamilyAccess(activityLogId: string, userId: string) {
+  private async verifyClubAccess(activityLogId: string, userId: string) {
     const log = await this.prisma.activityLog.findUnique({
       where: { id: activityLogId },
       include: { user: { select: { clubId: true } } },

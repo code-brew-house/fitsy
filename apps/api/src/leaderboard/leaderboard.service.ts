@@ -43,14 +43,14 @@ export class LeaderboardService {
         ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
         : new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    const familyMembers = await this.prisma.user.findMany({
+    const clubMembers = await this.prisma.user.findMany({
       where: { clubId },
       select: { id: true, name: true, image: true },
     });
 
-    if (familyMembers.length === 0) return [];
+    if (clubMembers.length === 0) return [];
 
-    const memberIds = familyMembers.map((m) => m.id);
+    const memberIds = clubMembers.map((m) => m.id);
 
     const aggregations = await this.prisma.activityLog.groupBy({
       by: ['userId'],
@@ -72,7 +72,7 @@ export class LeaderboardService {
       ]),
     );
 
-    const entries: LeaderboardEntry[] = familyMembers.map((member) => {
+    const entries: LeaderboardEntry[] = clubMembers.map((member) => {
       const agg = aggMap.get(member.id);
       return {
         userId: member.id,

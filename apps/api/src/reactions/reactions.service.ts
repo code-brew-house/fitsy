@@ -11,7 +11,7 @@ export class ReactionsService {
   constructor(private prisma: PrismaService) {}
 
   async toggle(activityLogId: string, userId: string, dto: ToggleReactionDto) {
-    await this.verifyFamilyAccess(activityLogId, userId);
+    await this.verifyClubAccess(activityLogId, userId);
 
     const existing = await this.prisma.reaction.findUnique({
       where: {
@@ -35,7 +35,7 @@ export class ReactionsService {
   }
 
   async getSummary(activityLogId: string, userId: string) {
-    await this.verifyFamilyAccess(activityLogId, userId);
+    await this.verifyClubAccess(activityLogId, userId);
 
     const reactions = await this.prisma.reaction.findMany({
       where: { activityLogId },
@@ -103,7 +103,7 @@ export class ReactionsService {
     return result;
   }
 
-  private async verifyFamilyAccess(activityLogId: string, userId: string) {
+  private async verifyClubAccess(activityLogId: string, userId: string) {
     const log = await this.prisma.activityLog.findUnique({
       where: { id: activityLogId },
       include: { user: { select: { clubId: true } } },

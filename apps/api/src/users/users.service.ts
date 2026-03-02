@@ -7,7 +7,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async getProfile(requestingUserId: string, targetUserId: string): Promise<ProfileResponse> {
-    // Fetch both users to verify same family
+    // Fetch both users to verify same club
     const [requester, target] = await Promise.all([
       this.prisma.user.findUnique({
         where: { id: requestingUserId },
