@@ -3,9 +3,9 @@ import * as schemas from './schemas';
 import { Role, MeasurementType, EffortLevel, RedemptionStatus } from './enums';
 
 // Request types (inferred from Zod schemas)
-export type CreateFamilyDto = z.infer<typeof schemas.createFamilySchema>;
-export type JoinFamilyDto = z.infer<typeof schemas.joinFamilySchema>;
-export type UpdateFamilyDto = z.infer<typeof schemas.updateFamilySchema>;
+export type CreateClubDto = z.infer<typeof schemas.createClubSchema>;
+export type JoinClubDto = z.infer<typeof schemas.joinClubSchema>;
+export type UpdateClubDto = z.infer<typeof schemas.updateClubSchema>;
 export type CreateActivityTypeDto = z.infer<typeof schemas.createActivityTypeSchema>;
 export type UpdateActivityTypeDto = z.infer<typeof schemas.updateActivityTypeSchema>;
 export type CreateActivityLogDto = z.infer<typeof schemas.createActivityLogSchema>;
@@ -25,12 +25,12 @@ export interface UserResponse {
   name: string;
   avatarUrl: string | null;
   role: Role;
-  familyId: string | null;
+  clubId: string | null;
   totalPoints: number;
   createdAt: string;
 }
 
-export interface FamilyResponse {
+export interface ClubResponse {
   id: string;
   name: string;
   inviteCode: string;

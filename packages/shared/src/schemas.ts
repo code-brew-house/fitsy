@@ -1,16 +1,16 @@
 import { z } from 'zod';
 import { MeasurementType, EffortLevel } from './enums';
 
-// Family
-export const createFamilySchema = z.object({
+// Club
+export const createClubSchema = z.object({
   name: z.string().min(1).max(100),
 });
 
-export const joinFamilySchema = z.object({
+export const joinClubSchema = z.object({
   inviteCode: z.string().min(1),
 });
 
-export const updateFamilySchema = z.object({
+export const updateClubSchema = z.object({
   name: z.string().min(1).max(100),
 });
 
