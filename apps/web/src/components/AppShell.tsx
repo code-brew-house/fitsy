@@ -13,6 +13,7 @@ import {
   Divider,
   Box,
   Stack,
+  ScrollArea,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { motion } from 'framer-motion';
@@ -146,56 +147,60 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Group>
       </MantineAppShell.Header>
 
-      <MantineAppShell.Navbar p="sm" style={{ paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px))' }}>
-        <Stack gap={4}>
-          {mainNav.map((item) => (
+      <MantineAppShell.Navbar p="sm">
+        <MantineAppShell.Section grow component={ScrollArea}>
+          <Stack gap={4}>
+            {mainNav.map((item) => (
+              <NavLink
+                key={item.href}
+                label={item.label}
+                leftSection={<item.icon size={20} />}
+                active={pathname === item.href}
+                onClick={() => navigate(item.href)}
+                color="indigo"
+                variant={pathname === item.href ? 'light' : 'subtle'}
+              />
+            ))}
+            <Divider my="xs" />
+            {secondaryNav.map((item) => (
+              <NavLink
+                key={item.href}
+                label={item.label}
+                leftSection={<item.icon size={20} />}
+                active={pathname === item.href}
+                onClick={() => navigate(item.href)}
+                color="indigo"
+                variant={pathname === item.href ? 'light' : 'subtle'}
+              />
+            ))}
+            {isAdmin && (
+              <>
+                <Divider my="xs" label="Admin" labelPosition="center" />
+                {adminNav.map((item) => (
+                  <NavLink
+                    key={item.href}
+                    label={item.label}
+                    leftSection={<item.icon size={20} />}
+                    active={pathname === item.href}
+                    onClick={() => navigate(item.href)}
+                    color="indigo"
+                    variant={pathname === item.href ? 'light' : 'subtle'}
+                  />
+                ))}
+              </>
+            )}
+          </Stack>
+        </MantineAppShell.Section>
+        <MantineAppShell.Section>
+          <Box pt="md">
             <NavLink
-              key={item.href}
-              label={item.label}
-              leftSection={<item.icon size={20} />}
-              active={pathname === item.href}
-              onClick={() => navigate(item.href)}
-              color="indigo"
-              variant={pathname === item.href ? 'light' : 'subtle'}
+              label="Logout"
+              leftSection={<IconLogout size={20} />}
+              onClick={logout}
+              c="red"
             />
-          ))}
-          <Divider my="xs" />
-          {secondaryNav.map((item) => (
-            <NavLink
-              key={item.href}
-              label={item.label}
-              leftSection={<item.icon size={20} />}
-              active={pathname === item.href}
-              onClick={() => navigate(item.href)}
-              color="indigo"
-              variant={pathname === item.href ? 'light' : 'subtle'}
-            />
-          ))}
-          {isAdmin && (
-            <>
-              <Divider my="xs" label="Admin" labelPosition="center" />
-              {adminNav.map((item) => (
-                <NavLink
-                  key={item.href}
-                  label={item.label}
-                  leftSection={<item.icon size={20} />}
-                  active={pathname === item.href}
-                  onClick={() => navigate(item.href)}
-                  color="indigo"
-                  variant={pathname === item.href ? 'light' : 'subtle'}
-                />
-              ))}
-            </>
-          )}
-        </Stack>
-        <Box mt="auto" pt="md">
-          <NavLink
-            label="Logout"
-            leftSection={<IconLogout size={20} />}
-            onClick={logout}
-            c="red"
-          />
-        </Box>
+          </Box>
+        </MantineAppShell.Section>
       </MantineAppShell.Navbar>
 
       <MantineAppShell.Main>
