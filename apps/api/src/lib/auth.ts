@@ -28,7 +28,7 @@ export const auth = betterAuth({
         defaultValue: 'MEMBER',
         input: false,
       },
-      familyId: {
+      clubId: {
         type: 'string',
         required: false,
         input: false,

@@ -45,7 +45,7 @@ describe('ActivityLogsService', () => {
 
   describe('create', () => {
     beforeEach(() => {
-      prisma.user.findUnique.mockResolvedValue({ familyId: 'family-1' });
+      prisma.user.findUnique.mockResolvedValue({ clubId: 'club-1' });
     });
 
     it('should calculate DISTANCE points: 5km running at 1pt/km = 5 pts', async () => {
@@ -55,7 +55,7 @@ describe('ActivityLogsService', () => {
         measurementType: 'DISTANCE',
         pointsPerUnit: 1,
         isActive: true,
-        familyId: 'family-1',
+        clubId: 'club-1',
       });
 
       const logResult = {
@@ -100,7 +100,7 @@ describe('ActivityLogsService', () => {
         pointsHigh: 8,
         pointsExtreme: 12,
         isActive: true,
-        familyId: 'family-1',
+        clubId: 'club-1',
       });
 
       const logResult = {
@@ -134,7 +134,7 @@ describe('ActivityLogsService', () => {
         measurementType: 'FLAT',
         flatPoints: 5,
         isActive: true,
-        familyId: 'family-1',
+        clubId: 'club-1',
       });
 
       const logResult = {
@@ -167,7 +167,7 @@ describe('ActivityLogsService', () => {
         measurementType: 'DURATION',
         pointsPerMinute: 0.067,
         isActive: true,
-        familyId: 'family-1',
+        clubId: 'club-1',
       });
 
       const logResult = {
@@ -201,7 +201,7 @@ describe('ActivityLogsService', () => {
         measurementType: 'DISTANCE',
         pointsPerUnit: 1,
         isActive: true,
-        familyId: 'family-1',
+        clubId: 'club-1',
       });
       prisma.activityLog.create.mockResolvedValue({ id: 'log-5', pointsEarned: 10, note: null, createdAt: new Date(), activityType: { name: 'Running', icon: '\u{1F3C3}' }, user: { name: 'Alice' } });
       prisma.user.update.mockResolvedValue({ id: 'user-1', totalPoints: 110 });
@@ -225,14 +225,14 @@ describe('ActivityLogsService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if user familyId does not match activity type familyId', async () => {
+    it('should throw NotFoundException if user clubId does not match activity type clubId', async () => {
       prisma.activityType.findUnique.mockResolvedValue({
         id: 'at-1',
         name: 'Running',
         measurementType: 'DISTANCE',
         pointsPerUnit: 1,
         isActive: true,
-        familyId: 'other-family',
+        clubId: 'other-club',
       });
 
       await expect(
@@ -305,9 +305,8 @@ describe('ActivityLogsService', () => {
   });
 
   describe('findFeed', () => {
-    it('should return recent activity logs for the whole family', async () => {
+    it('should return recent activity logs for the whole club', async () => {
       const now = new Date();
-      prisma.user.findMany.mockResolvedValue([{ id: 'user-1' }, { id: 'user-2' }]);
       const mockLogs = [
         {
           id: 'log-1',
@@ -330,7 +329,7 @@ describe('ActivityLogsService', () => {
         'log-1': [{ emoji: '\u{1F44D}', count: 2, userReacted: true }],
       });
 
-      const result = await service.findFeed('family-1', 'user-1', 20);
+      const result = await service.findFeed('club-1', 'user-1', 20);
 
       expect(result).toEqual([
         {
@@ -351,12 +350,8 @@ describe('ActivityLogsService', () => {
           createdAt: now.toISOString(),
         },
       ]);
-      expect(prisma.user.findMany).toHaveBeenCalledWith({
-        where: { familyId: 'family-1' },
-        select: { id: true },
-      });
       expect(prisma.activityLog.findMany).toHaveBeenCalledWith({
-        where: { userId: { in: ['user-1', 'user-2'] } },
+        where: { user: { clubId: 'club-1' } },
         include: {
           activityType: { select: { name: true, icon: true } },
           user: { select: { name: true } },

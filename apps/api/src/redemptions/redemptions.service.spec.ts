@@ -10,12 +10,12 @@ describe('RedemptionsService', () => {
   const mockUser = {
     id: 'user-1',
     totalPoints: 100,
-    familyId: 'family-1',
+    clubId: 'club-1',
   };
 
   const mockReward = {
     id: 'reward-1',
-    familyId: 'family-1',
+    clubId: 'club-1',
     name: 'Movie Night',
     pointCost: 50,
     quantity: null,
@@ -144,11 +144,11 @@ describe('RedemptionsService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw NotFoundException if reward belongs to different family', async () => {
+    it('should throw NotFoundException if reward belongs to different club', async () => {
       txUserFindUnique.mockResolvedValue(mockUser);
       txRewardFindUnique.mockResolvedValue({
         ...mockReward,
-        familyId: 'other-family',
+        clubId: 'other-club',
       });
 
       await expect(
@@ -162,14 +162,14 @@ describe('RedemptionsService', () => {
       prisma.redemption.findUnique.mockResolvedValue({
         id: 'redemption-1',
         status: 'PENDING',
-        reward: { familyId: 'family-1' },
+        reward: { clubId: 'club-1' },
       });
       prisma.redemption.update.mockResolvedValue({
         id: 'redemption-1',
         status: 'FULFILLED',
       });
 
-      const result = await service.fulfill('family-1', 'redemption-1');
+      const result = await service.fulfill('club-1', 'redemption-1');
       expect(result.status).toBe('FULFILLED');
     });
 
@@ -177,23 +177,23 @@ describe('RedemptionsService', () => {
       prisma.redemption.findUnique.mockResolvedValue({
         id: 'redemption-1',
         status: 'FULFILLED',
-        reward: { familyId: 'family-1' },
+        reward: { clubId: 'club-1' },
       });
 
       await expect(
-        service.fulfill('family-1', 'redemption-1'),
+        service.fulfill('club-1', 'redemption-1'),
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw NotFoundException if redemption not in family', async () => {
+    it('should throw NotFoundException if redemption not in club', async () => {
       prisma.redemption.findUnique.mockResolvedValue({
         id: 'redemption-1',
         status: 'PENDING',
-        reward: { familyId: 'other-family' },
+        reward: { clubId: 'other-club' },
       });
 
       await expect(
-        service.fulfill('family-1', 'redemption-1'),
+        service.fulfill('club-1', 'redemption-1'),
       ).rejects.toThrow(NotFoundException);
     });
   });

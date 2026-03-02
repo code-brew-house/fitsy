@@ -14,12 +14,12 @@ async function main() {
   await prisma.account.deleteMany();
   await prisma.verification.deleteMany();
   await prisma.user.deleteMany();
-  await prisma.family.deleteMany();
+  await prisma.club.deleteMany();
 
-  // Create family
-  const family = await prisma.family.create({
+  // Create club
+  const club = await prisma.club.create({
     data: {
-      name: 'The Smiths',
+      name: 'Smith Fitness Club',
       inviteCode: 'DEMO1234',
     },
   });
@@ -35,7 +35,7 @@ async function main() {
       emailVerified: true,
       name: 'Admin Smith',
       role: 'ADMIN',
-      familyId: family.id,
+      clubId: club.id,
       totalPoints: 0,
     },
   });
@@ -47,29 +47,29 @@ async function main() {
       emailVerified: true,
       name: 'Member Smith',
       role: 'MEMBER',
-      familyId: family.id,
+      clubId: club.id,
       totalPoints: 0,
     },
   });
 
   // Seed activity types
   const running = await prisma.activityType.create({
-    data: { familyId: family.id, name: 'Running', icon: '🏃', measurementType: 'DISTANCE', pointsPerUnit: 1, unit: 'km' },
+    data: { clubId: club.id, name: 'Running', icon: '🏃', measurementType: 'DISTANCE', pointsPerUnit: 1, unit: 'km' },
   });
   const cycling = await prisma.activityType.create({
-    data: { familyId: family.id, name: 'Cycling', icon: '🚴', measurementType: 'DISTANCE', pointsPerUnit: 0.4, unit: 'km' },
+    data: { clubId: club.id, name: 'Cycling', icon: '🚴', measurementType: 'DISTANCE', pointsPerUnit: 0.4, unit: 'km' },
   });
   const incline = await prisma.activityType.create({
-    data: { familyId: family.id, name: 'Incline Treadmill', icon: '⛰️', measurementType: 'DISTANCE', pointsPerUnit: 2, unit: 'km' },
+    data: { clubId: club.id, name: 'Incline Treadmill', icon: '⛰️', measurementType: 'DISTANCE', pointsPerUnit: 2, unit: 'km' },
   });
   const homeTread = await prisma.activityType.create({
-    data: { familyId: family.id, name: 'Home Treadmill', icon: '🏠', measurementType: 'DISTANCE', pointsPerUnit: 1, unit: 'km' },
+    data: { clubId: club.id, name: 'Home Treadmill', icon: '🏠', measurementType: 'DISTANCE', pointsPerUnit: 1, unit: 'km' },
   });
   const gym = await prisma.activityType.create({
-    data: { familyId: family.id, name: 'Gym Workout', icon: '🏋️', measurementType: 'EFFORT', pointsLow: 4, pointsMedium: 6, pointsHigh: 8, pointsExtreme: 12 },
+    data: { clubId: club.id, name: 'Gym Workout', icon: '🏋️', measurementType: 'EFFORT', pointsLow: 4, pointsMedium: 6, pointsHigh: 8, pointsExtreme: 12 },
   });
   const parkWalk = await prisma.activityType.create({
-    data: { familyId: family.id, name: 'Outdoor Park Walk', icon: '🌳', measurementType: 'FLAT', flatPoints: 5 },
+    data: { clubId: club.id, name: 'Outdoor Park Walk', icon: '🌳', measurementType: 'FLAT', flatPoints: 5 },
   });
 
   // Suppress unused variable warnings
@@ -101,9 +101,9 @@ async function main() {
   // Sample rewards
   await prisma.reward.createMany({
     data: [
-      { familyId: family.id, name: 'Movie Night', description: 'Pick any movie for family movie night', pointCost: 50 },
-      { familyId: family.id, name: 'Pizza Dinner', description: 'Choose your favorite pizza for dinner', pointCost: 100, quantity: 5 },
-      { familyId: family.id, name: 'New Running Shoes', description: 'Get a new pair of running shoes', pointCost: 500, quantity: 1 },
+      { clubId: club.id, name: 'Movie Night', description: 'Pick any movie for club movie night', pointCost: 50 },
+      { clubId: club.id, name: 'Pizza Dinner', description: 'Choose your favorite pizza for dinner', pointCost: 100, quantity: 5 },
+      { clubId: club.id, name: 'New Running Shoes', description: 'Get a new pair of running shoes', pointCost: 500, quantity: 1 },
     ],
   });
 

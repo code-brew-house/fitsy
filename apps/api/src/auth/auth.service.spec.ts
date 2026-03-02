@@ -15,11 +15,11 @@ describe('AuthService', () => {
     name: 'Test User',
     image: 'https://example.com/avatar.png',
     role: 'MEMBER',
-    familyId: 'family-1',
+    clubId: 'club-1',
     totalPoints: 42,
     createdAt: mockDate,
-    family: {
-      id: 'family-1',
+    club: {
+      id: 'club-1',
       name: 'The Tests',
       inviteCode: 'ABC123',
       createdAt: mockDate,
@@ -51,7 +51,7 @@ describe('AuthService', () => {
 
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        include: { family: true },
+        include: { club: true },
       });
 
       expect(result).toEqual({
@@ -60,11 +60,11 @@ describe('AuthService', () => {
         name: 'Test User',
         avatarUrl: 'https://example.com/avatar.png',
         role: 'MEMBER',
-        familyId: 'family-1',
+        clubId: 'club-1',
         totalPoints: 42,
         createdAt: mockDate.toISOString(),
-        family: {
-          id: 'family-1',
+        club: {
+          id: 'club-1',
           name: 'The Tests',
           inviteCode: 'ABC123',
           createdAt: mockDate.toISOString(),
@@ -76,27 +76,27 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue({
         ...mockUser,
         image: null,
-        familyId: null,
-        family: null,
+        clubId: null,
+        club: null,
       });
 
       const result = await service.getMe('user-1');
 
       expect(result.avatarUrl).toBeNull();
-      expect(result.family).toBeNull();
+      expect(result.club).toBeNull();
     });
 
-    it('should return null family when user has no family', async () => {
+    it('should return null club when user has no club', async () => {
       prisma.user.findUnique.mockResolvedValue({
         ...mockUser,
-        familyId: null,
-        family: null,
+        clubId: null,
+        club: null,
       });
 
       const result = await service.getMe('user-1');
 
-      expect(result.familyId).toBeNull();
-      expect(result.family).toBeNull();
+      expect(result.clubId).toBeNull();
+      expect(result.club).toBeNull();
     });
 
     it('should throw UnauthorizedException when user is not found', async () => {
