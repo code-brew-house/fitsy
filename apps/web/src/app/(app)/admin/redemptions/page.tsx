@@ -80,7 +80,7 @@ export default function AdminRedemptionsPage() {
     <Container size="lg">
       <Stack gap="md">
         <Group justify="space-between">
-          <Title order={2}>Family Redemptions</Title>
+          <Title order={2}>Club Redemptions</Title>
           <Select
             placeholder="Filter by status"
             clearable

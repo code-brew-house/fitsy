@@ -33,18 +33,18 @@ interface MemberResponse extends UserResponse {
 export default function AdminMembersPage() {
   const { user: currentUser } = useAuth();
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const [family, setFamily] = useState<ClubResponse | null>(null);
+  const [club, setClub] = useState<ClubResponse | null>(null);
   const [members, setMembers] = useState<MemberResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [familyData, membersData] = await Promise.all([
+      const [clubData, membersData] = await Promise.all([
         api.get<ClubResponse>('/club'),
         api.get<MemberResponse[]>('/club/members'),
       ]);
-      setFamily(familyData);
+      setClub(clubData);
       setMembers(membersData);
     } catch {
       notifications.show({ title: 'Error', message: 'Failed to load club data', color: 'red' });
@@ -62,7 +62,7 @@ export default function AdminMembersPage() {
     setRegenerating(true);
     try {
       const data = await api.post<ClubResponse>('/club/regenerate-code', {});
-      setFamily(data);
+      setClub(data);
       notifications.show({ title: 'Success', message: 'Invite code regenerated', color: 'indigo' });
     } catch (err) {
       notifications.show({
@@ -103,18 +103,18 @@ export default function AdminMembersPage() {
       <Stack gap="md">
         <Title order={2}>Club Members</Title>
 
-        {family && (
+        {club && (
           <Paper p="md" radius="md" withBorder>
             <Stack gap="xs">
               <Text size="sm" fw={500}>Invite Code</Text>
               <Group>
                 <TextInput
-                  value={family.inviteCode}
+                  value={club.inviteCode}
                   readOnly
                   style={{ flex: 1 }}
                   styles={{ input: { fontFamily: 'monospace', letterSpacing: '0.1em' } }}
                 />
-                <CopyButton value={family.inviteCode} timeout={2000}>
+                <CopyButton value={club.inviteCode} timeout={2000}>
                   {({ copied, copy }) => (
                     <Tooltip label={copied ? 'Copied' : 'Copy'} withArrow>
                       <ActionIcon color={copied ? 'indigo' : 'gray'} variant="subtle" onClick={copy} size="lg">
