@@ -45,8 +45,8 @@ model User {
 
   // App-specific fields
   role          Role      @default(MEMBER)
-  familyId      String?
-  family        Family?   @relation(fields: [familyId], references: [id])
+  clubId        String?
+  club          Club?     @relation(fields: [clubId], references: [id])
   totalPoints   Int       @default(0)
 
   // BetterAuth relations
@@ -59,7 +59,7 @@ model User {
   comments      Comment[]
   reactions     Reaction[]
 
-  @@index([familyId])
+  @@index([clubId])
   @@map("user")
 }
 
@@ -109,7 +109,7 @@ model Verification {
 
 // === App tables ===
 
-model Family {
+model Club {
   id            String         @id @default(uuid())
   name          String
   inviteCode    String         @unique
@@ -121,8 +121,8 @@ model Family {
 
 model ActivityType {
   id              String          @id @default(uuid())
-  familyId        String
-  family          Family          @relation(fields: [familyId], references: [id])
+  clubId          String
+  club            Club            @relation(fields: [clubId], references: [id])
   name            String
   icon            String
   measurementType MeasurementType
@@ -138,7 +138,7 @@ model ActivityType {
   createdAt       DateTime        @default(now())
   activityLogs    ActivityLog[]
 
-  @@index([familyId])
+  @@index([clubId])
 }
 
 model ActivityLog {
@@ -189,8 +189,8 @@ model Reaction {
 
 model Reward {
   id          String       @id @default(uuid())
-  familyId    String
-  family      Family       @relation(fields: [familyId], references: [id])
+  clubId      String
+  club        Club         @relation(fields: [clubId], references: [id])
   name        String
   description String
   imageUrl    String?
@@ -200,7 +200,7 @@ model Reward {
   createdAt   DateTime     @default(now())
   redemptions Redemption[]
 
-  @@index([familyId])
+  @@index([clubId])
 }
 
 model Redemption {
