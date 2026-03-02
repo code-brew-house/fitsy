@@ -11,6 +11,20 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope & typeof globalThis;
 
+const CURRENT_CACHE_VERSION = 'v2';
+
+self.addEventListener('activate', (event: ExtendableEvent) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => !name.includes(CURRENT_CACHE_VERSION))
+          .map((name) => caches.delete(name))
+      );
+    })
+  );
+});
+
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
   skipWaiting: true,
