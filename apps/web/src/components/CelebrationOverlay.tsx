@@ -72,7 +72,7 @@ export function CelebrationOverlay({
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           >
             <Stack align="center" gap="xs">
-              <Text size="3rem" fw={800} c="white" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>
+              <Text size="3rem" fw={800} c="white" ta="center" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>
                 {message}
               </Text>
               <Box

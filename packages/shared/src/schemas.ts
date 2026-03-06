@@ -38,6 +38,7 @@ export const createActivityLogSchema = z.object({
   effortLevel: z.nativeEnum(EffortLevel).optional(),
   durationMinutes: z.number().int().positive().optional(),
   note: z.string().max(500).optional(),
+  performedAt: z.string().datetime().optional(),
 });
 
 // Rewards

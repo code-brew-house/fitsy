@@ -75,6 +75,7 @@ export interface ActivityLogResponse {
   note: string | null;
   commentCount: number;
   reactions: ReactionSummary[];
+  performedAt: string;
   createdAt: string;
 }
 

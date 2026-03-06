@@ -10,14 +10,15 @@ import {
   SimpleGrid,
   Skeleton,
   NumberInput,
-  SegmentedControl,
   Button,
   Paper,
   Group,
   Textarea,
+  Chip,
 } from '@mantine/core';
+import { DateTimePicker } from '@mantine/dates';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconArrowLeft, IconCheck } from '@tabler/icons-react';
+import { IconArrowLeft, IconCheck, IconCalendarEvent } from '@tabler/icons-react';
 import { MeasurementType, EffortLevel } from '@fitsy/shared';
 import type { ActivityTypeResponse, ActivityLogResponse } from '@fitsy/shared';
 import { api } from '../../../lib/api';
@@ -26,6 +27,17 @@ import { CelebrationOverlay } from '../../../components/CelebrationOverlay';
 import { AnimatedCounter } from '../../../components/AnimatedCounter';
 import { AnimatedList, AnimatedListItem } from '../../../components/AnimatedList';
 import { useHaptics } from '../../../hooks/useHaptics';
+
+const EFFORT_OPTIONS: { label: string; value: EffortLevel }[] = [
+  { label: 'Low', value: EffortLevel.LOW },
+  { label: 'Medium', value: EffortLevel.MEDIUM },
+  { label: 'High', value: EffortLevel.HIGH },
+  { label: 'Extreme', value: EffortLevel.EXTREME },
+];
+
+const CHIP_STYLES = {
+  label: { width: '100%', justifyContent: 'center', fontWeight: 600 },
+} as const;
 
 export default function LogPage() {
   const router = useRouter();
@@ -41,6 +53,8 @@ export default function LogPage() {
   const [effort, setEffort] = useState<EffortLevel>(EffortLevel.MEDIUM);
   const [duration, setDuration] = useState<number | string>(10);
   const [note, setNote] = useState('');
+  const [performedAt, setPerformedAt] = useState<Date | null>(null);
+  const maxDate = useMemo(() => new Date(), []);
 
   useEffect(() => {
     api
@@ -98,6 +112,10 @@ export default function LogPage() {
 
     if (note.trim()) {
       body.note = note.trim();
+    }
+
+    if (performedAt) {
+      body.performedAt = performedAt.toISOString();
     }
 
     try {
@@ -179,19 +197,27 @@ export default function LogPage() {
                         <Text size="sm" fw={500} mb="xs">
                           Effort Level
                         </Text>
-                        <SegmentedControl
+                        <Chip.Group
+                          multiple={false}
                           value={effort}
                           onChange={(val) => setEffort(val as EffortLevel)}
-                          data={[
-                            { label: 'Low', value: EffortLevel.LOW },
-                            { label: 'Medium', value: EffortLevel.MEDIUM },
-                            { label: 'High', value: EffortLevel.HIGH },
-                            { label: 'Extreme', value: EffortLevel.EXTREME },
-                          ]}
-                          fullWidth
-                          size="md"
-                          color="indigo"
-                        />
+                        >
+                          <SimpleGrid cols={2} spacing="xs">
+                            {EFFORT_OPTIONS.map((opt) => (
+                              <Chip
+                                key={opt.value}
+                                value={opt.value}
+                                variant="filled"
+                                color="indigo"
+                                size="lg"
+                                radius="md"
+                                styles={CHIP_STYLES}
+                              >
+                                {opt.label}
+                              </Chip>
+                            ))}
+                          </SimpleGrid>
+                        </Chip.Group>
                       </div>
                     )}
 
@@ -211,6 +237,17 @@ export default function LogPage() {
                         size="lg"
                       />
                     )}
+
+                    <DateTimePicker
+                      label="Date & Time"
+                      placeholder="Now (default)"
+                      value={performedAt}
+                      onChange={setPerformedAt}
+                      maxDate={maxDate}
+                      clearable
+                      leftSection={<IconCalendarEvent size={18} />}
+                      size="md"
+                    />
 
                     <Textarea
                       label="Note (optional)"

@@ -153,6 +153,7 @@ model ActivityLog {
   durationMinutes Int?
   pointsEarned    Int
   note            String?
+  performedAt     DateTime        @default(now())
   createdAt       DateTime        @default(now())
   comments        Comment[]
   reactions       Reaction[]

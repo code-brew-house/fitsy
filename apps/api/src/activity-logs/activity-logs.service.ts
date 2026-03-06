@@ -39,6 +39,7 @@ export class ActivityLogsService {
           durationMinutes: dto.durationMinutes ?? null,
           pointsEarned,
           note: dto.note ?? null,
+          performedAt: dto.performedAt ? new Date(dto.performedAt) : undefined,
         },
         include: {
           activityType: { select: { name: true, icon: true } },
@@ -66,6 +67,7 @@ export class ActivityLogsService {
       note: log.note ?? null,
       commentCount: 0,
       reactions: [],
+      performedAt: log.performedAt.toISOString(),
       createdAt: log.createdAt.toISOString(),
     };
   }
@@ -110,6 +112,7 @@ export class ActivityLogsService {
         note: log.note ?? null,
         commentCount: log._count.comments,
         reactions: reactionSummaries[log.id] || [],
+        performedAt: log.performedAt.toISOString(),
         createdAt: log.createdAt.toISOString(),
       })),
       total,
@@ -148,6 +151,7 @@ export class ActivityLogsService {
       note: log.note ?? null,
       commentCount: log._count.comments,
       reactions: reactionSummaries[log.id] || [],
+      performedAt: log.performedAt.toISOString(),
       createdAt: log.createdAt.toISOString(),
     }));
   }
@@ -209,6 +213,7 @@ export class ActivityLogsService {
       note: updated.note ?? null,
       commentCount: 0,
       reactions: [],
+      performedAt: updated.performedAt.toISOString(),
       createdAt: updated.createdAt.toISOString(),
     };
   }

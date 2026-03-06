@@ -67,6 +67,7 @@ export class DashboardService {
       note: log.note ?? null,
       commentCount: 0,
       reactions: [],
+      performedAt: log.performedAt.toISOString(),
       createdAt: log.createdAt.toISOString(),
     }));
 
